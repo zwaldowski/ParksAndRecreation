@@ -1,0 +1,5 @@
+/* Description used for the test */
+"test-string" = "This is a test.";
+
+/* Help text used for a positional description */
+"test-progress-%@-of-%@" = "%1$@ of %2$@ remaining.";
