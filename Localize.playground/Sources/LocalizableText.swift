@@ -28,13 +28,6 @@ extension LocalizableText: StringInterpolationConvertible {
     }
     
     public init<T>(stringInterpolationSegment expression: T) {
-        print(T.self)
-        if T.self is Dictionary<NSObject, NSFormatter>.Type {
-            print("Yeah!")
-        }
-        if let expression = expression as? (NSObject, NSFormatter) {
-            print(expression)
-        }
         if let expression = expression as? String {
             self = .Segment(expression)
         } else {
