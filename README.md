@@ -3,6 +3,26 @@ Various Swift playgrounds, for fun and for profit.
 
 ## Index
 
+### [Data](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Data.playground)
+
+An idiomatic `Data<T>`, representing any buffer (contiguous or discontiguous) of numeric elements. Part `NSData`, part `dispatch_data_t`, `Data` is useful for low-level byte-based APIs in Swift, such as crypto and string parsing.
+
+Create one with an array:
+
+```swift
+let data = Data<UInt8>(array: [ 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x2c, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21 ])
+```
+
+And enumerate through it in constant time:
+
+```swift
+for byte in data {
+	...
+}
+```
+
+Made with lots of help from [@a2](https://github.com/a2).
+
 ### [String Localization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Localize.playground)
 
 Formatted localization using Swift string formatting. Introduces `localize` with a similar prototype to `NSLocalizedString`:
