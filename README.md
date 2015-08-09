@@ -23,6 +23,10 @@ for byte in data {
 
 Made with lots of help from [@a2](https://github.com/a2).
 
+### [Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Geometry.playground)
+
+Mathematical operators and idiomatic bridging for Core Graphics types.
+
 ### [String Localization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Localize.playground)
 
 Formatted localization using Swift string formatting. Introduces `localize` with a similar prototype to `NSLocalizedString`:
@@ -48,3 +52,9 @@ And in your `Localizable.strings`, just like in Cocoa:
 ```
 
 All placeholders should be `%@` on the end of the key, and be represented positionally, i.e., with `%1$@`, `%2$@`, and so on.
+
+
+### [UI Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/UI%020Geometry.playground)
+
+Conveniences for using Core Graphics types in UI programming, such as retina-friendly
+rounding and equation operators that account for floating point inaccuracy.
