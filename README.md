@@ -5,7 +5,9 @@ Various Swift playgrounds, for fun and for profit.
 
 ### [Data](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Data.playground)
 
-An idiomatic `Data<T>`, representing any buffer (contiguous or discontiguous) of numeric elements. Part `NSData`, part `dispatch_data_t`, `Data` is useful for low-level byte-based APIs in Swift, such as crypto and string parsing.
+An idiomatic `Data<T>`, representing any buffer (contiguous or discontiguous) of
+numeric elements. Part `NSData`, part `dispatch_data_t`, `Data` is useful for
+low-level byte-based APIs in Swift, such as crypto and string parsing.
 
 Create one with an array:
 
@@ -29,13 +31,16 @@ Mathematical operators and idiomatic bridging for Core Graphics types.
 
 ### [String Localization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Localize.playground)
 
-Formatted localization using Swift string formatting. Introduces `localize` with a similar prototype to `NSLocalizedString`:
+Formatted localization using Swift string formatting. Introduces `localize` with
+a similar prototype to `NSLocalizedString`:
 
 ```swift
 func localize(text: LocalizableText, tableName: String? = default, bundle: NSBundle = default, value: String = default, comment: String)
 ```
 
-What's a `LocalizableText`? It's an intermediary type that deconstructs interpolation segments for use with string formatting. But that's not important, what's important is that it's literal convertible:
+What's a `LocalizableText`? It's an intermediary type that deconstructs
+interpolation segments for use with string formatting. But that's not important,
+what's important is that it's literal convertible:
 
 ```swift
 let filesLeft = 4
@@ -51,7 +56,8 @@ And in your `Localizable.strings`, just like in Cocoa:
 
 ```
 
-All placeholders should be `%@` on the end of the key, and be represented positionally, i.e., with `%1$@`, `%2$@`, and so on.
+All placeholders should be `%@` on the end of the key, and be represented
+positionally, i.e., with `%1$@`, `%2$@`, and so on.
 
 
 ### [UI Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/UI%020Geometry.playground)
