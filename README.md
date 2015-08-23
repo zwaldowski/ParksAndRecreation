@@ -29,6 +29,12 @@ Made with lots of help from [@a2](https://github.com/a2).
 
 Mathematical operators and idiomatic bridging for Core Graphics types.
 
+### [Keyboard Layout Guide](https://github.com/zwaldowski/ParksAndRecreation/blob/master/KeyboardLayoutGuide)
+
+An extension on `UIViewController` providing a `keyboardLayoutGuide` property. The layout guide normally mirrors the `topLayoutGuide` and `bottomLayoutGuide`, but automatically resizes to avoid the keyboard.
+
+Requires iOS 9.0.
+
 ### [String Localization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Localize.playground)
 
 Formatted localization using Swift string formatting. Introduces `localize` with
