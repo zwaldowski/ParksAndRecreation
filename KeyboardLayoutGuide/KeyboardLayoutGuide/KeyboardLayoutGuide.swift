@@ -9,85 +9,63 @@
 import UIKit
 import ObjectiveC
 
-private class KeyboardLayoutGuide: UILayoutGuide {
+// MARK: Generic implementation
+
+private struct KeyboardInfo {
+    let animationDuration: NSTimeInterval
+    let animationOptions: UIViewAnimationOptions
+    let endFrame: CGRect
+    let forDismissing: Bool
     
-    struct KeyboardInfo {
-        let animationDuration: NSTimeInterval
-        let animationOptions: UIViewAnimationOptions
-        let endFrame: CGRect
-        let forDismissing: Bool
-        
-        init?(_ userInfo: [NSObject: AnyObject]?, dismissing: Bool) {
-            guard let userInfo = userInfo,
-                duration = userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSTimeInterval,
-                curve = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
-                endFrame = userInfo[UIKeyboardFrameEndUserInfoKey]?.CGRectValue else {
-                    return nil
-            }
-            
-            self.animationDuration = duration
-            self.animationOptions = UIViewAnimationOptions(rawValue: curve << 16)
-            self.endFrame = endFrame
-            self.forDismissing = dismissing
-        }
-        
-        func overlapInView(view: UIView) -> CGFloat? {
-            guard let window = view.window where !forDismissing else {
+    init?(_ userInfo: [NSObject: AnyObject]?, dismissing: Bool) {
+        guard let userInfo = userInfo,
+            duration = userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSTimeInterval,
+            curve = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
+            endFrame = userInfo[UIKeyboardFrameEndUserInfoKey]?.CGRectValue else {
                 return nil
-            }
-
-            let keyboardFrameWindow = window.convertRect(endFrame, fromWindow: nil)
-            let keyboardFrameLocal = window.convertRect(keyboardFrameWindow, toView: view.superview)
-            let coveredFrame = view.frame.rectByIntersecting(keyboardFrameLocal)
-            let finalOverlap = window.convertRect(coveredFrame, toView: view.superview)
-            return finalOverlap.height
         }
+        
+        self.animationDuration = duration
+        self.animationOptions = UIViewAnimationOptions(rawValue: curve << 16)
+        self.endFrame = endFrame
+        self.forDismissing = dismissing
     }
     
-    // MARK: UILayoutGuide
-    
-    override init() {
-        super.init()
-        identifier = "DZWKeyboard"
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    override weak var owningView: UIView? {
-        didSet {
-            guard let view = owningView else {
-                keyboardBottomInsetConstraint = nil
-                return
-            }
-            
-            let vc = view.nextViewController
-            let vcTopAnchor = vc?.topLayoutGuide.bottomAnchor ?? view.layoutMarginsGuide.topAnchor
-            let vcBottomAnchor = vc?.bottomLayoutGuide.topAnchor ?? view.layoutMarginsGuide.bottomAnchor
-            let newKeyboardConstraint = view.layoutMarginsGuide.bottomAnchor.constraintEqualToAnchor(bottomAnchor)
-
-            NSLayoutConstraint.activateConstraints([
-                leadingAnchor.constraintEqualToAnchor(view.leadingAnchor),
-                trailingAnchor.constraintEqualToAnchor(view.trailingAnchor),
-                topAnchor.constraintEqualToAnchor(vcTopAnchor),
-                bottomAnchor.constraintEqualToAnchor(vcBottomAnchor).atPriority(250),
-                bottomAnchor.constraintLessThanOrEqualToAnchor(vcBottomAnchor).atPriority(999),
-                newKeyboardConstraint
-            ])
-            
-            keyboardBottomInsetConstraint = newKeyboardConstraint
-            
-            resumeIfNeeded()
+    func overlapInView(view: UIView) -> CGFloat? {
+        guard let window = view.window where !forDismissing else {
+            return nil
         }
+        
+        let keyboardFrameWindow = window.convertRect(endFrame, fromWindow: nil)
+        let keyboardFrameLocal = window.convertRect(keyboardFrameWindow, toView: view.superview)
+        let coveredFrame = view.frame.rectByIntersecting(keyboardFrameLocal)
+        let finalOverlap = window.convertRect(coveredFrame, toView: view.superview)
+        return finalOverlap.height
     }
+}
+
+private protocol KeyboardLayoutGuideType: UILayoutSupport {
+    
+    weak var owningView: UIView? { get }
+
+    var viewIsDisappearing: Bool { get set }
+    var registeredForNotifications: Bool { get set }
+    var keyboardBottomInsetConstraint: NSLayoutConstraint! { get set }
+    var hidingDebounce: dispatch_block_t? { get set }
+    
+    @objc func keyboardResize(note: NSNotification)
+    @objc func keyboardWillHide(note: NSNotification)
+    
+}
+
+private struct Debounce {
+    static var HideKeyboard = false
+}
+
+extension KeyboardLayoutGuideType {
     
     // MARK: Tracking
-    
-    var viewIsDisappearing = false
-    var registeredForNotifications = false
-    var keyboardBottomInsetConstraint: NSLayoutConstraint!
-    
+
     func resumeIfNeeded() {
         defer { viewIsDisappearing = false }
         guard !registeredForNotifications else { return }
@@ -118,29 +96,53 @@ private class KeyboardLayoutGuide: UILayoutGuide {
         UIView.animateWithDuration(duration, delay: 0, options: [ curve, .BeginFromCurrentState ], animations: view.layoutIfNeeded, completion: nil)
     }
     
+    func setupConstraints() {
+        guard let view = owningView else {
+            keyboardBottomInsetConstraint = nil
+            return
+        }
+        
+        let vc = view.nextViewController
+        let vcTopLayoutGuide: AnyObject = vc?.topLayoutGuide ?? view
+        let vcTopLayoutAttr: NSLayoutAttribute = vc.map { _ in .Top } ?? .Bottom
+        let vcBottomLayoutGuide: AnyObject = vc?.bottomLayoutGuide ?? view
+        let newKeyboardConstraint = NSLayoutConstraint(item: view, attribute: .Bottom, relatedBy: .Equal, toItem: self, attribute: .Bottom, multiplier: 1, constant: 0)
+        
+        NSLayoutConstraint.activateConstraints([
+            NSLayoutConstraint(item: self, attribute: .Leading, relatedBy: .Equal, toItem: view, attribute: .LeadingMargin, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: view, attribute: .TrailingMargin, relatedBy: .Equal, toItem: self, attribute: .Trailing, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: self, attribute: .Top, relatedBy: .Equal, toItem: vcTopLayoutGuide, attribute: vcTopLayoutAttr, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: self, attribute: .Bottom, relatedBy: .Equal, toItem: vcBottomLayoutGuide, attribute: .Bottom, multiplier: 1, constant: 0).atPriority(250),
+            NSLayoutConstraint(item: self, attribute: .Bottom, relatedBy: .LessThanOrEqual, toItem: vcBottomLayoutGuide, attribute: .Bottom, multiplier: 1, constant: 0).atPriority(999),
+            newKeyboardConstraint
+        ])
+        
+        keyboardBottomInsetConstraint = newKeyboardConstraint
+        
+        resumeIfNeeded()
+    }
+    
     // MARK: Notifications
     
-    var hidingDebounce: dispatch_block_t?
-    
-    @objc func keyboardResize(note: NSNotification) {
+    func resizeKeyboardFromUserInfo(userInfo: [NSObject : AnyObject]?) {
         if let block = hidingDebounce {
             dispatch_block_cancel(block)
         }
         
         guard !updateForDisappearing() else { return }
         
-        let info = KeyboardInfo(note.userInfo, dismissing: false)
+        let info = KeyboardInfo(userInfo, dismissing: false)
         updateForKeyboardInfo(info)
     }
     
-    @objc func keyboardWillHide(note: NSNotification) {
+    func hideKeyboardFromUseInfokeyboardWillHide(userInfo: [NSObject : AnyObject]?) {
         if let block = hidingDebounce {
             dispatch_block_cancel(block)
         }
-
+        
         guard !updateForDisappearing() else { return }
-
-        let info = KeyboardInfo(note.userInfo, dismissing: true)
+        
+        let info = KeyboardInfo(userInfo, dismissing: true)
         hidingDebounce = NSRunLoop.mainRunLoop().perform {
             self.updateForKeyboardInfo(info)
         }
@@ -148,10 +150,115 @@ private class KeyboardLayoutGuide: UILayoutGuide {
     
 }
 
-extension KeyboardLayoutGuide: UILayoutSupport {
+// MARK: - UILayoutGuide
+
+@available(iOS 9.0, *)
+private class KeyboardLayoutGuide: UILayoutGuide, KeyboardLayoutGuideType {
+    
+    var viewIsDisappearing = false
+    var registeredForNotifications = false
+    var keyboardBottomInsetConstraint: NSLayoutConstraint!
+    var hidingDebounce: dispatch_block_t?
+    
+    override init() {
+        super.init()
+        identifier = "DZWKeyboard"
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override weak var owningView: UIView? {
+        didSet {
+            setupConstraints()
+        }
+    }
+    
+    // MARK: Notifications
+    
+    @objc func keyboardResize(note: NSNotification) {
+        resizeKeyboardFromUserInfo(note.userInfo)
+    }
+    
+    @objc func keyboardWillHide(note: NSNotification) {
+        hideKeyboardFromUseInfokeyboardWillHide(note.userInfo)
+    }
+    
+    // MARK: UILayoutSupport
     
     @objc private var length: CGFloat {
         return layoutFrame.height
+    }
+    
+}
+
+// MARK: - UIView
+
+private class KeyboardLayoutGuideLegacy: UIView, KeyboardLayoutGuideType {
+    
+    var viewIsDisappearing = false
+    var registeredForNotifications = false
+    var keyboardBottomInsetConstraint: NSLayoutConstraint!
+    var hidingDebounce: dispatch_block_t?
+    
+    override class func layerClass() -> AnyClass {
+        return CATransformLayer.self
+    }
+    
+    private func commonInit() {
+        super.hidden = true
+        translatesAutoresizingMaskIntoConstraints = false
+    }
+
+    init() {
+        super.init(frame: CGRect.zeroRect)
+        commonInit()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        commonInit()
+    }
+    
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        setupConstraints()
+    }
+    
+    override var backgroundColor: UIColor? {
+        get { return nil }
+        set { }
+    }
+    
+    override var opaque: Bool {
+        get { return false }
+        set { }
+    }
+    
+    override var hidden: Bool {
+        get { return true }
+        set { }
+    }
+    
+    // MARK: Notifications
+    
+    @objc func keyboardResize(note: NSNotification) {
+        resizeKeyboardFromUserInfo(note.userInfo)
+    }
+    
+    @objc func keyboardWillHide(note: NSNotification) {
+        hideKeyboardFromUseInfokeyboardWillHide(note.userInfo)
+    }
+    
+    // MARK: UILayoutSupport
+    
+    var owningView: UIView? {
+        return superview
+    }
+    
+    @objc private var length: CGFloat {
+        return bounds.height
     }
     
 }
@@ -172,14 +279,21 @@ extension UIViewController {
     var keyboardLayoutGuide: UILayoutSupport {
         assert(isViewLoaded(), "This layout guide should not be accessed before the view is loaded.")
         
-        if let guide = objc_getAssociatedObject(self, &AssociatedObjects.KeyboardLayoutGuide) as? KeyboardLayoutGuide {
+        if let guide = objc_getAssociatedObject(self, &AssociatedObjects.KeyboardLayoutGuide) as? UILayoutSupport {
             return guide
         }
         
-        let guide = KeyboardLayoutGuide()
-        view.addLayoutGuide(guide)
-        objc_setAssociatedObject(self, &AssociatedObjects.KeyboardLayoutGuide, guide, .OBJC_ASSOCIATION_ASSIGN)
-        return guide
+        if #available(iOS 9.0, *) {
+            let guide = KeyboardLayoutGuide()
+            view.addLayoutGuide(guide)
+            objc_setAssociatedObject(self, &AssociatedObjects.KeyboardLayoutGuide, guide, .OBJC_ASSOCIATION_ASSIGN)
+            return guide
+        } else {
+            let guide = KeyboardLayoutGuideLegacy()
+            view.addSubview(guide)
+            objc_setAssociatedObject(self, &AssociatedObjects.KeyboardLayoutGuide, guide, .OBJC_ASSOCIATION_ASSIGN)
+            return guide
+        }
     }
     
 }
