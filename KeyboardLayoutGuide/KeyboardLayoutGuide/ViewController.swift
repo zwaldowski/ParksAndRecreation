@@ -16,11 +16,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let newGuide = keyboardLayoutGuide.dynamicType.init()
-        print(newGuide)
-        
         NSLayoutConstraint.activateConstraints([
-            redView.bottomAnchor.constraintEqualToAnchor(keyboardLayoutGuide.bottomAnchor)
+            NSLayoutConstraint(item: redView, attribute: .Bottom, relatedBy: .Equal, toItem: keyboardLayoutGuide, attribute: .Bottom, multiplier: 1, constant: 0)
         ])
     }
 

@@ -46,13 +46,9 @@ private class KeyboardLayoutGuide: UILayoutGuide {
     
     // MARK: UILayoutGuide
     
-    init(forViewController: ()) {
+    override init() {
         super.init()
         identifier = "DZWKeyboard"
-    }
-    
-    override init() {
-        fatalError("This layout guide cannot be instantiated on its own. See UIViewController.keyboardLayoutGuide.")
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -152,6 +148,14 @@ private class KeyboardLayoutGuide: UILayoutGuide {
     
 }
 
+extension KeyboardLayoutGuide: UILayoutSupport {
+    
+    @objc private var length: CGFloat {
+        return layoutFrame.height
+    }
+    
+}
+
 // MARK: - UIViewController
 
 private struct AssociatedObjects {
@@ -165,14 +169,14 @@ extension UIViewController {
     /// guides of the recieving view controller and the leading and trailing
     /// margins of its view. When the keyboard is active, the bottom of the
     /// guide retracts to include whatever space the keyboard overlaps in.
-    var keyboardLayoutGuide: UILayoutGuide {
+    var keyboardLayoutGuide: UILayoutSupport {
         assert(isViewLoaded(), "This layout guide should not be accessed before the view is loaded.")
         
         if let guide = objc_getAssociatedObject(self, &AssociatedObjects.KeyboardLayoutGuide) as? KeyboardLayoutGuide {
             return guide
         }
         
-        let guide = KeyboardLayoutGuide(forViewController: ())
+        let guide = KeyboardLayoutGuide()
         view.addLayoutGuide(guide)
         objc_setAssociatedObject(self, &AssociatedObjects.KeyboardLayoutGuide, guide, .OBJC_ASSOCIATION_ASSIGN)
         return guide
