@@ -43,54 +43,10 @@ extension Data {
         try self.init(data.dispatchValue)
     }
     
-}
-
-// MARK: AnyObject bridging
-
-/// Swift standard library trickiness for `as AnyObject`. This API is not
-/// expected to stick around forever, but for now it's nice.
-extension Data: _ObjectiveCBridgeable {
-    
-    /// Return true iff instances of `Self` can be converted to
-    /// Objective-C.
-    public static func _isBridgedToObjectiveC() -> Bool {
-        return true
-    }
-    
-    /// The class type used in Objective-C.
-    public static func _getObjectiveCType() -> Any.Type {
-        return NSData.self
-    }
-    
     /// Convert `self` to Objective-C.
-    public func _bridgeToObjectiveC() -> NSData {
-        return data as! NSData
-    }
-    
-    /// Bridge from an Objective-C object of the bridged class type to a
-    /// value of `Self`, used for forced downcasting.
-    ///
-    /// :param: result The location where the result is written. The optional
-    /// will always contain a value.
-    public static func _forceBridgeFromObjectiveC(source: NSData, inout result: Data?) {
-        result = try! Data(source)
-    }
-    
-    /// Try to bridge from an Objective-C object of the bridged class
-    /// type to a value of `Self`, used for conditional downcasting.
-    ///
-    /// :param: result The location where the result is written.
-    ///
-    /// :returns: true if bridging succeeded, false otherwise. This redundant
-    /// information is provided for the convenience of the runtime.
-    public static func _conditionallyBridgeFromObjectiveC(source: NSData, inout result: Data?) -> Bool {
-        do {
-            result = try Data(source)
-            return true
-        } catch {
-            result = nil
-            return false
-        }
+    public var objectValue: NSData! {
+        assert(OS_OBJECT_USE_OBJC != 0, "Casting `Data<T>` to `NSData` requires Objective-C ARC bridging for OS objects.")
+        return data as? NSData
     }
     
 }
