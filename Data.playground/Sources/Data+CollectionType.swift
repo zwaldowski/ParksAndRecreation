@@ -32,14 +32,18 @@ extension Data {
     ///  - `.Unmap` to free data created by `mmap` or equivalent.
     ///  - `.Custom` for some custom deallocation.
     public init(unsafeWithBuffer buffer: UnsafeBufferPointer<T>, queue: dispatch_queue_t = dispatch_get_global_queue(0, 0), behavior: UnsafeBufferOwnership<T>) {
-        self.init(unsafeWithBuffer: buffer, queue: queue, destructor: {
-            switch behavior {
-            case .Copy: return nil
-            case .Free: return _dispatch_data_destructor_free
-            case .Unmap: return _dispatch_data_destructor_munmap
-            case .Custom(let fn): return { fn(buffer) }
-            }
-        }())
+        let destructor: dispatch_block_t?
+        switch behavior {
+        case .Copy:
+            destructor = nil
+        case .Free:
+            destructor = _dispatch_data_destructor_free
+        case .Unmap:
+            destructor = _dispatch_data_destructor_munmap
+        case .Custom(let fn):
+            destructor = { fn(buffer) }
+        }
+        self.init(unsafeWithBuffer: buffer, queue: queue, destructor: destructor)
     }
     
     /// Create `Data` backed by the contiguous contents of an array.
