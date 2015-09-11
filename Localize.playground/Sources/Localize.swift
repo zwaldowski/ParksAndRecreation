@@ -28,14 +28,9 @@ private extension LocalizableText {
 public func localize(text: LocalizableText, tableName: String? = nil, bundle: NSBundle = NSBundle.mainBundle(), value: String = "", comment: String) -> String {
     let (key, strings) = text.localizationSegments
     let format = bundle.localizedStringForKey(key, value: value, table: tableName)
-    guard !strings.isEmpty else { return format }
-    
-    let args = strings.map {
-        Unmanaged.passRetained($0).toOpaque()
-        } as [CVarArgType]
-    let formatted = String(format: format, arguments: args)
-    for ptr in args {
-        Unmanaged<NSString>.fromOpaque(ptr as! COpaquePointer).release()
-    }
-    return formatted
+    return String(format: format, arguments: strings.map {
+        let ref = Unmanaged.passRetained($0)
+        ref.autorelease()
+        return ref.toOpaque()
+    })
 }
