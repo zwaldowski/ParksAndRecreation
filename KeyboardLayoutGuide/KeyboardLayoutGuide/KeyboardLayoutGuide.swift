@@ -38,7 +38,7 @@ private struct KeyboardInfo {
         
         let keyboardFrameWindow = window.convertRect(endFrame, fromWindow: nil)
         let keyboardFrameLocal = window.convertRect(keyboardFrameWindow, toView: view.superview)
-        let coveredFrame = view.frame.rectByIntersecting(keyboardFrameLocal)
+        let coveredFrame = view.frame.intersect(keyboardFrameLocal)
         let finalOverlap = window.convertRect(coveredFrame, toView: view.superview)
         return finalOverlap.height
     }
@@ -212,7 +212,7 @@ private class KeyboardLayoutGuideLegacy: UIView, KeyboardLayoutGuideType {
     }
 
     init() {
-        super.init(frame: CGRect.zeroRect)
+        super.init(frame: CGRect.zero)
         commonInit()
     }
     
