@@ -11,13 +11,20 @@ import ObjectiveC
 
 // MARK: Generic implementation
 
+private let KeyboardUserInfoIsDismissingKey = "DZWKeyboardIsDismissing"
+
 private struct KeyboardInfo {
     let animationDuration: NSTimeInterval
     let animationOptions: UIViewAnimationOptions
     let endFrame: CGRect
     let forDismissing: Bool
     
-    init?(_ userInfo: [NSObject: AnyObject]?, dismissing: Bool) {
+    init?(legacyUserInfo userInfo: [NSObject: AnyObject]?) {
+        let dismissing = (userInfo?[KeyboardUserInfoIsDismissingKey] as? Bool) ?? false
+        self.init(userInfo: userInfo, dismissing: dismissing)
+    }
+    
+    init?(userInfo: [NSObject: AnyObject]?, dismissing: Bool) {
         guard let userInfo = userInfo,
             duration = userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSTimeInterval,
             curve = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? UInt,
@@ -51,20 +58,13 @@ private protocol KeyboardLayoutGuideType: UILayoutSupport {
     var viewIsDisappearing: Bool { get set }
     var registeredForNotifications: Bool { get set }
     var keyboardBottomInsetConstraint: NSLayoutConstraint! { get set }
-    var hidingDebounce: dispatch_block_t? { get set }
     
     @objc func keyboardResize(note: NSNotification)
     @objc func keyboardWillHide(note: NSNotification)
     
 }
 
-private struct Debounce {
-    static var HideKeyboard = false
-}
-
 extension KeyboardLayoutGuideType {
-    
-    // MARK: Tracking
 
     func resumeIfNeeded() {
         defer { viewIsDisappearing = false }
@@ -82,18 +82,6 @@ extension KeyboardLayoutGuideType {
         let isHidden = view.window == nil || view.nextViewController.map { $0.isBeingDismissed() || $0.isMovingFromParentViewController() } ?? false
         viewIsDisappearing = isHidden
         return isHidden
-    }
-    
-    func updateForKeyboardInfo(info: KeyboardInfo?) {
-        guard !viewIsDisappearing, let view = owningView where view.nextViewController?.popoverPresentationController == nil else {
-            return
-        }
-        
-        keyboardBottomInsetConstraint.constant = info?.overlapInView(view) ?? 0
-        
-        let duration = info?.animationDuration ?? 0
-        let curve = info?.animationOptions ?? []
-        UIView.animateWithDuration(duration, delay: 0, options: [ curve, .BeginFromCurrentState ], animations: view.layoutIfNeeded, completion: nil)
     }
     
     func setupConstraints() {
@@ -117,34 +105,24 @@ extension KeyboardLayoutGuideType {
             newKeyboardConstraint
         ])
         
+        
         keyboardBottomInsetConstraint = newKeyboardConstraint
         
         resumeIfNeeded()
     }
     
-    // MARK: Notifications
-    
-    func resizeKeyboardFromUserInfo(userInfo: [NSObject : AnyObject]?) {
-        if let block = hidingDebounce {
-            dispatch_block_cancel(block)
+    func updateForKeyboardInfo(info: KeyboardInfo?, animated: Bool) {
+        guard !viewIsDisappearing, let view = owningView, let vc = view.nextViewController where vc.popoverPresentationController == nil else {
+            return
         }
         
-        guard !updateForDisappearing() else { return }
-        
-        let info = KeyboardInfo(userInfo, dismissing: false)
-        updateForKeyboardInfo(info)
-    }
-    
-    func hideKeyboardFromUseInfokeyboardWillHide(userInfo: [NSObject : AnyObject]?) {
-        if let block = hidingDebounce {
-            dispatch_block_cancel(block)
-        }
-        
-        guard !updateForDisappearing() else { return }
-        
-        let info = KeyboardInfo(userInfo, dismissing: true)
-        hidingDebounce = NSRunLoop.mainRunLoop().perform {
-            self.updateForKeyboardInfo(info)
+        keyboardBottomInsetConstraint.constant = info?.overlapInView(view) ?? 0
+        if animated {
+            let duration = info?.animationDuration ?? 0
+            let curve = info?.animationOptions ?? []
+            UIView.animateWithDuration(duration, delay: 0, options: [ curve, .BeginFromCurrentState ], animations: view.layoutIfNeeded, completion: nil)
+        } else {
+            view.layoutIfNeeded()
         }
     }
     
@@ -178,16 +156,22 @@ private class KeyboardLayoutGuide: UILayoutGuide, KeyboardLayoutGuideType {
     // MARK: Notifications
     
     @objc func keyboardResize(note: NSNotification) {
-        resizeKeyboardFromUserInfo(note.userInfo)
+        guard !updateForDisappearing() else { return }
+        
+        let info = KeyboardInfo(userInfo: note.userInfo, dismissing: false)
+        updateForKeyboardInfo(info, animated: false)
     }
     
     @objc func keyboardWillHide(note: NSNotification) {
-        hideKeyboardFromUseInfokeyboardWillHide(note.userInfo)
+        guard !updateForDisappearing() else { return }
+
+        let info = KeyboardInfo(userInfo: note.userInfo, dismissing: true)
+        updateForKeyboardInfo(info, animated: false)
     }
     
     // MARK: UILayoutSupport
     
-    @objc private var length: CGFloat {
+    @objc var length: CGFloat {
         return layoutFrame.height
     }
     
@@ -206,7 +190,7 @@ private class KeyboardLayoutGuideLegacy: UIView, KeyboardLayoutGuideType {
         return CATransformLayer.self
     }
     
-    private func commonInit() {
+    func commonInit() {
         super.hidden = true
         translatesAutoresizingMaskIntoConstraints = false
     }
@@ -243,12 +227,34 @@ private class KeyboardLayoutGuideLegacy: UIView, KeyboardLayoutGuideType {
     
     // MARK: Notifications
     
+    var deferredKeyboardUserInfo: [NSObject: AnyObject]?
+    
     @objc func keyboardResize(note: NSNotification) {
-        resizeKeyboardFromUserInfo(note.userInfo)
+        NSRunLoop.mainRunLoop().cancelPerformSelector("updateForCurrentKeyboardUserInfo", target: self, argument: nil)
+        deferredKeyboardUserInfo = nil
+        
+        guard !updateForDisappearing() else { return }
+        
+        let info = KeyboardInfo(legacyUserInfo: note.userInfo)
+        updateForKeyboardInfo(info, animated: true)
     }
     
     @objc func keyboardWillHide(note: NSNotification) {
-        hideKeyboardFromUseInfokeyboardWillHide(note.userInfo)
+        NSRunLoop.mainRunLoop().cancelPerformSelector("updateForCurrentKeyboardUserInfo", target: self, argument: nil)
+        
+        guard !updateForDisappearing() else { return }
+        
+        var userInfo = note.userInfo ?? [:]
+        userInfo[KeyboardUserInfoIsDismissingKey] = true
+        deferredKeyboardUserInfo = userInfo
+        
+        NSRunLoop.mainRunLoop().performSelector("updateForCurrentKeyboardUserInfo", target: self, argument: nil, order: 0, modes: [NSRunLoopCommonModes])
+    }
+    
+    @objc func updateForCurrentKeyboardUserInfo() {
+        let info = KeyboardInfo(legacyUserInfo: deferredKeyboardUserInfo)
+        updateForKeyboardInfo(info, animated: true)
+        deferredKeyboardUserInfo = nil
     }
     
     // MARK: UILayoutSupport
@@ -257,7 +263,7 @@ private class KeyboardLayoutGuideLegacy: UIView, KeyboardLayoutGuideType {
         return superview
     }
     
-    @objc private var length: CGFloat {
+    @objc var length: CGFloat {
         return bounds.height
     }
     
@@ -317,20 +323,6 @@ private extension NSLayoutConstraint {
     func atPriority(priority: UILayoutPriority) -> NSLayoutConstraint {
         self.priority = priority
         return self
-    }
-    
-}
-
-private extension NSRunLoop {
-    
-    // A fancy cancellable `performSelector(_:withObject:afterDelay:inModes:)`
-    // cribbed from UIKit disassembly. Similar to `dispatch_async`, but
-    // using @c NSRunLoopCommonModes ensures dispatch during tracking
-    // runloops (such as dragging a scroll view) to allow animating out.
-    func perform(inModes modes: [String] = [NSRunLoopCommonModes], body: () -> ()) -> dispatch_block_t {
-        let wrapper = dispatch_block_create(dispatch_block_flags_t(0), body)!
-        CFRunLoopPerformBlock(getCFRunLoop(), NSRunLoopCommonModes, wrapper)
-        return wrapper
     }
     
 }
