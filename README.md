@@ -25,6 +25,10 @@ for byte in data {
 
 Made with lots of help from [@a2](https://github.com/a2).
 
+### [Fixing `dispatch_block_t`](https://github.com/zwaldowski/ParksAndRecreation/blob/master/DispatchBlock.playground)
+
+Even though it's been fixed in 2.1, Swift 2.0 has a rather ugly bug with wrapped `dispatch_block_t` types. Fix it with a C few tricks and a rational `DispatchBlock` type.
+
 ### [Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Geometry.playground)
 
 Mathematical operators and idiomatic bridging for Core Graphics types.
