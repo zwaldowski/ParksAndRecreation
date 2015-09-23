@@ -70,7 +70,7 @@ All placeholders should be `%@` on the end of the key, and be represented
 positionally, i.e., with `%1$@`, `%2$@`, and so on.
 
 
-### [UI Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/UI%020Geometry.playground)
+### [UI Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/UI%20Geometry.playground)
 
 Conveniences for using Core Graphics types in UI programming, such as retina-friendly
 rounding and equation operators that account for floating point inaccuracy.
