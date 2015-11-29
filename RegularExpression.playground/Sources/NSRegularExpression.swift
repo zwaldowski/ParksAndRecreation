@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct MatchGroup {
+public struct MatchGroup: CustomReflectable, CustomStringConvertible, CustomDebugStringConvertible {
     
     private let result: NSTextCheckingResult
     private let string: String
@@ -28,10 +28,33 @@ public struct MatchGroup {
         return string[range]
     }
     
-    var ranges: LazyMapCollection<Range<Int>, Range<String.Index>?> {
-        return (1 ..< result.numberOfRanges).lazy.map {
-            self.result.rangeAtIndex($0.successor()).sameRangeIn(self.string)
+    public var ranges: LazyMapCollection<Range<Int>, Range<String.Index>?> {
+        return (1 ..< result.numberOfRanges).lazy.map { [result, string] in
+            let range = result.rangeAtIndex($0.successor())
+            return range.sameRangeIn(string)
         }
+    }
+    
+    public var substrings: LazyMapCollection<Range<Int>, String?> {
+        return (1 ..< result.numberOfRanges).lazy.map { [result, string] in
+            let range = result.rangeAtIndex($0.successor())
+            return range.sameRangeIn(string).map { string[$0] }
+        }
+    }
+    
+    public var description: String {
+        return "range: \(range), substring: \"\(substring)\""
+    }
+    
+    public var debugDescription: String {
+        return String(result)
+    }
+    
+    public func customMirror() -> Mirror {
+        return Mirror(self, children: [
+            "range": String(range),
+            "substring": substring
+        ], displayStyle: .Struct, ancestorRepresentation: .Suppressed)
     }
     
 }
@@ -59,6 +82,20 @@ public extension NSRegularExpression {
         return matches.lazy.map {
             MatchGroup(result: $0, within: string)
         }
+    }
+    
+    func splitMatches(within string: String, options: NSMatchingOptions = [], range: Range<String.Index>? = nil) -> [String] {
+        let matches = self.matches(within: string, options: options, range: range)
+        var start = range?.startIndex ?? string.startIndex
+        let end = range?.endIndex ?? string.endIndex
+        var splits = [String]()
+        splits.reserveCapacity(matches.count + 1)
+        for match in matches {
+            splits.append(string[start..<match.range.startIndex])
+            start = match.range.endIndex
+        }
+        splits.append(string[start..<end])
+        return splits
     }
     
 }
