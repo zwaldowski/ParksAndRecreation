@@ -51,16 +51,20 @@ private struct KeyboardInfo {
     }
 }
 
-private protocol KeyboardLayoutGuideType: UILayoutSupport {
+@objc private protocol KeyboardLayoutGuideNotifications {
+    
+    @objc func keyboardResize(note: NSNotification)
+    @objc func keyboardWillHide(note: NSNotification)
+    
+}
+
+private protocol KeyboardLayoutGuideType: KeyboardLayoutGuideNotifications, UILayoutSupport {
     
     weak var owningView: UIView? { get }
 
     var viewIsDisappearing: Bool { get set }
     var registeredForNotifications: Bool { get set }
     var keyboardBottomInsetConstraint: NSLayoutConstraint! { get set }
-    
-    @objc func keyboardResize(note: NSNotification)
-    @objc func keyboardWillHide(note: NSNotification)
     
 }
 
