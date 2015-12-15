@@ -17,7 +17,7 @@ If you're hurting for Objective-C's `MyClassType<SomeProtocolType> *`, try this 
 
 ### [Custom Truncation](https://github.com/zwaldowski/ParksAndRecreation/blob/master/CustomTruncation.playground)
 
-Use [TextKit](https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/CustomTextProcessing/CustomTextProcessing.html) to perform custom truncation with high-performance. Also an example of creating building a drop-in `UILabel` backed by TextKit.
+Use [TextKit](https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/CustomTextProcessing/CustomTextProcessing.html) to perform custom truncation with high performance. Also an example of creating building a drop-in `UILabel` backed by TextKit.
 
 ### [Data](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Data.playground)
 
