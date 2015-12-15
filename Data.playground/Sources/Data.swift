@@ -83,33 +83,11 @@ extension Data {
         }
     }
     
-    private func byteRangeForIndex(i: Int) -> HalfOpenInterval<Int> {
-        let byteStart = Data.fromBytes(i)
-        let byteEnd = byteStart + sizeof(T)
-        return byteStart ..< byteEnd
-    }
-    
 }
 
 // MARK: Collection conformances
 
-extension Data: SequenceType {
-    
-    /// A collection view representing the underlying contiguous byte buffers
-    /// making up the data. Enumerating through this collection is useful
-    /// for feeding an iterative API, such as crypto routines.
-    public var byteRegions: DataRegions {
-        return DataRegions(data: data)
-    }
-    
-    /// Return a *generator* over the `T`s that comprise this *data*.
-    public func generate() -> DataGenerator<T> {
-        return DataGenerator(regions: byteRegions.generate())
-    }
-    
-}
-
-extension Data: Indexable {
+extension Data {
     
     /// The position of the first element in the data.
     ///
@@ -127,32 +105,6 @@ extension Data: Indexable {
         return Data.toBytes(endByte)
     }
     
-    /// This subscript is not performance-friendly, and will always underperform
-    /// enumeration of the `Data` or application accross its `byteRegions`.
-    public subscript(i: Int) -> T {
-        let byteRange = byteRangeForIndex(i)
-        assert(byteRange.end < endByte, "Data index out of range")
-        
-        var ret = T.allZeros
-        withUnsafeMutablePointer(&ret) { retPtrIn -> () in
-            var retPtr = UnsafeMutablePointer<UInt8>(retPtrIn)
-            apply { (_, chunkRange, buffer) -> Bool in
-                let copyRange = chunkRange.clamp(byteRange)
-                if !copyRange.isEmpty {
-                    let size = copyRange.end - copyRange.start
-                    memmove(retPtr, buffer.baseAddress + copyRange.start, size)
-                    retPtr += size
-                }
-                return chunkRange.end < byteRange.end
-            }
-        }
-        return ret
-    }
-    
-}
-
-extension Data: CollectionType {
-    
     public subscript (bounds: Range<Int>) -> Data<T> {
         let offset = Data.toBytes(bounds.startIndex)
         let length = Data.toBytes(bounds.endIndex - bounds.startIndex)
@@ -166,7 +118,7 @@ extension Data: CollectionType {
 extension Data {
     
     /// Combine the recieving data with the given data in constant time.
-    public mutating func extend(newData: Data<T>) {
+    public mutating func appendContentsOf(newData: Data<T>) {
         self += newData
     }
     
@@ -177,7 +129,7 @@ public func +<T: UnsignedIntegerType>(lhs: Data<T>, rhs: Data<T>) -> Data<T> {
     return Data(unsafe: dispatch_data_create_concat(lhs.data, rhs.data))
 }
 
-/// Operator form of `Data<T>.extend`.
+/// Operator form of `Data<T>.appendContentsOf`.
 public func +=<T: UnsignedIntegerType>(inout lhs: Data<T>, rhs: Data<T>) {
     lhs = lhs + rhs
 }
@@ -202,108 +154,6 @@ extension Data {
     
 }
 
-// MARK: Generators
-
-/// The `SequenceType` returned by `Data.byteBuffers`.  `DataRegions`
-/// is a sequence of byte buffers, represented in Swift as
-/// `UnsafeBufferPointer<UInt8>`.
-public struct DataRegions: SequenceType {
-    
-    private let data: dispatch_data_t
-    
-    private init(data: dispatch_data_t) {
-        self.data = data
-    }
-    
-    /// Start enumeration of byte buffers.
-    public func generate() -> DataRegionsGenerator {
-        return DataRegionsGenerator(data: data)
-    }
-    
-}
-
-/// A generator over the underlying contiguous storage of a `Data<T>`.
-public struct DataRegionsGenerator: GeneratorType, SequenceType {
-    
-    private let data: dispatch_data_t
-    private var region = dispatch_data_empty
-    private var nextByteOffset = 0
-    
-    private init(data: dispatch_data_t) {
-        self.data = data
-    }
-    
-    /// Advance to the next buffer and return it, or `nil` if no more buffers
-    /// exist.
-    ///
-    /// - Requires: No preceding call to `self.next()` has returned `nil`.
-    public mutating func next() -> UnsafeBufferPointer<UInt8>? {
-        if nextByteOffset >= dispatch_data_get_size(data) {
-            return nil
-        }
-        
-        let nextRegion = dispatch_data_copy_region(data, nextByteOffset, &nextByteOffset)
-        
-        // This won't remap the buffer because the region will be a leaf,
-        // so it just returns the buffer
-        var mapPtr = UnsafePointer<Void>()
-        var mapSize = 0
-        region = dispatch_data_create_map(nextRegion, &mapPtr, &mapSize)
-        nextByteOffset += mapSize
-        
-        return UnsafeBufferPointer(start: UnsafePointer(mapPtr), count: mapSize)
-    }
-    
-    /// Restart enumeration of byte buffers.
-    public func generate() -> DataRegionsGenerator {
-        return DataRegionsGenerator(data: data)
-    }
-    
-}
-
-public struct DataGenerator<T: UnsignedIntegerType>: GeneratorType, SequenceType {
-    
-    private var regions: DataRegionsGenerator
-    private var buffer: UnsafeBufferPointerGenerator<UInt8>?
-    
-    private init(regions: DataRegionsGenerator) {
-        self.regions = regions
-    }
-    
-    private mutating func nextByte() -> UInt8? {
-        // continue through existing region
-        if let next = buffer?.next() { return next }
-        
-        // get next region
-        guard let nextRegion = regions.next() else { return nil }
-        
-        // start generating
-        var nextBuffer = nextRegion.generate()
-        guard let byte = nextBuffer.next() else {
-            buffer = nil
-            return nil
-        }
-        buffer = nextBuffer
-        return byte
-    }
-    
-    /// Advance to the next element and return it, or `nil` if no next
-    /// element exists.
-    ///
-    /// - Requires: No preceding call to `self.next()` has returned `nil`.
-    public mutating func next() -> T? {
-        return (0 ..< sizeof(T)).reduce(T.allZeros) { (current, byteIdx) -> T? in
-            guard let current = current, byte = nextByte() else { return nil }
-            return current | numericCast(byte << UInt8(byteIdx * 8))
-        }
-    }
-    
-    /// Restart enumeration of the data.
-    public func generate() -> DataGenerator<T> {
-        return DataGenerator(regions: regions.generate())
-    }
-    
-}
 
 // MARK: Introspection
 
@@ -312,18 +162,6 @@ extension Data: CustomStringConvertible {
     /// A textual representation of `self`.
     public var description: String {
         return data.description
-    }
-    
-}
-
-extension Data: CustomReflectable {
-    
-    /// Return the `Mirror` for `self`.
-    public func customMirror() -> Mirror {
-        // Appears as an array of the integer type, as suggested in the docs
-        // for Mirror.init(_:unlabeledChildren:displayStyle:ancestorRepresentation:).
-        // An improved version might show regions and/or segmented hex values.
-        return Mirror(self, unlabeledChildren: self, displayStyle: .Collection)
     }
     
 }

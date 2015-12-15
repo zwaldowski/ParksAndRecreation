@@ -19,23 +19,12 @@ The `Data` type is most efficiently used through enumeration rather than
 indexing. This generator goes through each element in sequence — even if the
 data is discontiguous.
 */
-var generator = data.generate()
+var string = ""
 
 //: Use Swift's UTF-8 decoding mechanism to append scalars to a string.
-var string = ""
-var encoder = UTF8()
-
-loop: while true {
-    let result = encoder.decode(&generator)
-    switch result {
-    case .Result(let scalar):
-        string.append(scalar)
-    case .EmptyInput:
-        break loop
-    case .Error:
-        string.append("\u{FFFD}" as UnicodeScalar)
-    }
-}
+transcode(UTF8.self, UTF32.self, data.generate(), {
+    string.append(UnicodeScalar($0))
+}, stopOnError: false)
 
 //: The resulting string:
 string

@@ -3,6 +3,8 @@
 import XCPlayground
 import Foundation
 
+XCPlaygroundPage.currentPage.needsIndefiniteExecution = true
+
 /*: Another use: Use `dispatch_io_t` to efficiently read files in
 chunks from disk. Though this rather contrived sample has the same
 memory impact as reading a whole file into memory, it respects system
@@ -31,7 +33,6 @@ dispatch_io_read(io8, 0, Int.max, queue) { (finished, nextData, errno) in
         data8 += try! Data(nextData)
         
         print("Done! \(data8)")
-        let f = data8 as! AnyObject
     }
 }
 
@@ -47,14 +48,12 @@ dispatch_io_read(io16B, 0, Int.max, queue) { (finished, nextData, errno) -> Void
     case (true, nil, let errno):
         print("Error \(errno)")
     case (false, let nextData, _):
-        data16B += Data<UInt16>(nextData, partial: &leftover)
+        data16B += Data(nextData, partial: &leftover)
     case (true, let nextData, _):
-        data16B += Data<UInt16>(nextData, partial: &leftover)
+        data16B += Data(nextData, partial: &leftover)
         
         print("Done! \(data16B)")
     }
 }
-
-XCPSetExecutionShouldContinueIndefinitely(true)
 
 //: [Next](@next)
