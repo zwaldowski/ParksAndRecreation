@@ -3,6 +3,22 @@ Various Swift playgrounds, for fun and for profit.
 
 ## Index
 
+### [AnyCollectionSlice](https://github.com/zwaldowski/ParksAndRecreation/blob/master/AnyCollectionSlice.playground)
+
+Derived from @krzyzanowskim's [blog post](http://blog.krzyzanowskim.com/2015/10/24/chunksequence-have-cake-and-eat-it/): use protocol extension to split any collection into a group of slices. Think `flatten()`, but in reverse.
+
+### [BetterCoreDataInit](https://github.com/zwaldowski/ParksAndRecreation/blob/master/BetterCoreDataInit.playground)
+
+Use protocol extension to achieve simpler Core Data, like `MyManagedObject(context:)`.
+
+### [ConcretePlusProtocol](https://github.com/zwaldowski/ParksAndRecreation/blob/master/ConcretePlusProtocol.playground)
+
+If you're hurting for Objective-C's `MyClassType<SomeProtocolType> *`, try this on for size.
+
+### [Custom Truncation](https://github.com/zwaldowski/ParksAndRecreation/blob/master/CustomTruncation.playground)
+
+Use [TextKit](https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/CustomTextProcessing/CustomTextProcessing.html) to perform custom truncation with high-performance. Also an example of creating building a drop-in `UILabel` backed by TextKit.
+
 ### [Data](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Data.playground)
 
 An idiomatic `Data<T>`, representing any buffer (contiguous or discontiguous) of
@@ -76,7 +92,15 @@ using `UIControl`, but for weakly held objects and without unsafe selectors.
 
 Heavily inspired by [this blog post](http://oleb.net/blog/2014/07/swift-instance-methods-curried-functions/) from @ole.
 
+### [Regular Expressions](https://github.com/zwaldowski/ParksAndRecreation/blob/master/RegularExpression.playground)
+
+Simple Swift bridging for [`NSRegularExpression`](https://developer.apple.com/library/mac/documentation/Foundation/Reference/NSRegularExpression_Class/), as well as general patterns to go from `String.UTF16View` and `Range<String.UTF16Index>` to `NSString` and `NSRange`.
+
 ### [UI Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/UI%20Geometry.playground)
 
 Conveniences for using Core Graphics types in UI programming, such as retina-friendly
 rounding and equation operators that account for floating point inaccuracy.
+
+### [View Recursion](https://github.com/zwaldowski/ParksAndRecreation/blob/master/ViewRecursion.playground)
+
+Showing off the simple power of Swift iterators by performing breadth-first travel through the trees created by `UIView`, `UIViewController`, and `CALayer`.
