@@ -12,7 +12,7 @@ extension SequenceType where Generator.Element == UnicodeScalar {
     
 }
 
-extension SequenceType where Generator.Element: IntegerType {
+extension SequenceType where Generator.Element: UnsignedIntegerType {
     
     public func decode<Encoding: UnicodeCodecType where Encoding.CodeUnit == Generator.Element>(encoding: Encoding.Type, stopOnError: Bool = false, minimumCapacity: Int = 0) -> String? {
         // The `underestimateCount()` is just a best estimate; we can't
@@ -29,7 +29,7 @@ extension SequenceType where Generator.Element: IntegerType {
     
 }
 
-extension CollectionType where Generator.Element: IntegerType {
+extension CollectionType where Generator.Element: UnsignedIntegerType {
     
     // h/t Swift stdlib: https://github.com/apple/swift/blob/master/stdlib/public/core/StringBuffer.swift
     public func decode<Encoding: UnicodeCodecType where Encoding.CodeUnit == Generator.Element>(encoding: Encoding.Type, repairIllFormedSequences: Bool = false, minimumCapacity: Int = 0) -> String? {
