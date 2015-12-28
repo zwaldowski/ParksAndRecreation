@@ -2,7 +2,7 @@ import Foundation
 
 private extension NSData {
     
-    private func wrapToDispatchData(copy copy: Bool) -> dispatch_data_t {
+    func wrapToDispatchDataByCopy(copy: Bool) -> dispatch_data_t {
         var ret = dispatch_data_empty
         enumerateByteRangesUsingBlock { (bytes, byteRange, _) in
             let chunk: dispatch_data_t
@@ -10,9 +10,7 @@ private extension NSData {
                 chunk = dispatch_data_create(bytes, byteRange.length, nil, nil)
             } else {
                 let innerData = Unmanaged.passRetained(self)
-                chunk = dispatch_data_create(bytes, byteRange.length, nil) {
-                    innerData.release()
-                }
+                chunk = dispatch_data_create(bytes, byteRange.length, nil, innerData.release)
             }
             ret = dispatch_data_create_concat(ret, chunk)
         }
@@ -25,10 +23,10 @@ private extension NSData {
         } else if let dd = self as? dispatch_data_t {
             return dd
         } else if self is NSMutableData {
-            return wrapToDispatchData(copy: true)
+            return wrapToDispatchDataByCopy(true)
         } else {
             let copied: NSData = unsafeDowncast(copy())
-            return copied.wrapToDispatchData(copy: copied !== self)
+            return copied.wrapToDispatchDataByCopy(copied !== self)
         }
     }
     
