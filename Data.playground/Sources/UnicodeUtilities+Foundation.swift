@@ -19,9 +19,10 @@ extension NSData {
     }
 
     public func decode<Encoding: UnicodeCodecType where Encoding.CodeUnit: UnsignedIntegerType>(codec: Encoding.Type) -> String? {
-        return withExtendedLifetime(self) {
-            let buf = UnsafeBufferPointer<Encoding.CodeUnit>(start: UnsafePointer(bytes), count: length / sizeof(Encoding.CodeUnit.self))
-            return buf.decode(codec)
+        do {
+            return try Data<Encoding.CodeUnit>(self).decode(codec)
+        } catch {
+            return nil
         }
     }
     
