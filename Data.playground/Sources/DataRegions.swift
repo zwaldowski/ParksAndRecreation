@@ -15,10 +15,10 @@ private extension dispatch_data_t {
     
 }
 
-/// The `CollectionType` returned by `Data.byteRegionsView`.  `DataRegionsView`
+/// The `CollectionType` returned by `Data.byteRegions`.  `DataRegions`
 /// is a forward collection of byte buffers, represented in Swift as
 /// `UnsafeBufferPointer<UInt8>`.
-public struct DataRegionsView {
+public struct DataRegions {
     
     private let data: dispatch_data_t
     
@@ -28,7 +28,7 @@ public struct DataRegionsView {
     
 }
 
-extension DataRegionsView: SequenceType {
+extension DataRegions: SequenceType {
     
     /// A generator over the underlying contiguous storage of a `Data<T>`.
     public struct Generator: GeneratorType, SequenceType {
@@ -66,7 +66,7 @@ extension DataRegionsView: SequenceType {
     
 }
 
-extension DataRegionsView: CollectionType {
+extension DataRegions: CollectionType {
     
     /// A type that represents a valid region in the collection.
     ///
@@ -83,7 +83,7 @@ extension DataRegionsView: CollectionType {
         }
         
         /// Return the next consecutive value in a discrete sequence of
-        /// `DataRegionsView.Index` values.
+        /// `DataRegions.Index` values.
         public func successor() -> Index {
             var nextStartOffset = 0
             let region = dispatch_data_copy_region(data, startOffset, &nextStartOffset)
@@ -109,7 +109,7 @@ extension DataRegionsView: CollectionType {
     
     /// Returns the region at the given `position`.
     public subscript(position: Index) -> UnsafeBufferPointer<UInt8> {
-        precondition(position.data === data, "Invalid Index for this DataRegionsViewNew view")
+        precondition(position.data === data, "Invalid Index for this DataRegions view")
         precondition(position.startOffset < dispatch_data_get_size(data), "can not subscript using an endIndex")
         var unused = 0
         return dispatch_data_copy_region(data, position.startOffset, &unused).mapLeaf()
@@ -123,7 +123,7 @@ extension DataRegionsView: CollectionType {
 }
 
 /// Returns true iff `lhs` and `rhs` store the same underlying collection.
-public func ==(lhs: DataRegionsView.Index, rhs: DataRegionsView.Index) -> Bool {
+public func ==(lhs: DataRegions.Index, rhs: DataRegions.Index) -> Bool {
     return lhs.data === rhs.data && lhs.startOffset == rhs.startOffset
 }
 
@@ -132,15 +132,15 @@ extension Data {
     /// A collection view representing the underlying contiguous byte buffers
     /// making up the data. Enumerating through this collection is useful
     /// for feeding an iterative API, such as crypto routines.
-    public var byteRegionsView: DataRegionsView {
-        return DataRegionsView(data)
+    public var byteRegions: DataRegions {
+        return DataRegions(data)
     }
     
     /// A collection view representing the actual bytes making up the data.
     /// Enumerating through this collection, though with a performance cost,
     /// is good for presentation and debugging.
-    public var bytesView: FlattenCollection<DataRegionsView> {
-        return byteRegionsView.flatten()
+    public var bytes: FlattenCollection<DataRegions> {
+        return byteRegions.flatten()
     }
     
 }
@@ -154,7 +154,7 @@ extension Data: CustomReflectable {
         // Appears as an array of the integer type, as suggested in the docs
         // for Mirror.init(_:unlabeledChildren:displayStyle:ancestorRepresentation:).
         // An improved version might show segmented hex values.
-        let hexBytes = bytesView.lazy.map { "0x" + String($0, radix: 16) }
+        let hexBytes = bytes.lazy.map { "0x" + String($0, radix: 16) }
         return Mirror(self, unlabeledChildren: hexBytes, displayStyle: .Collection)
     }
     

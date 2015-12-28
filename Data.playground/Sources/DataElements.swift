@@ -6,13 +6,13 @@ import Dispatch
 /// buffer.
 public struct DataGenerator<T: UnsignedIntegerType>: GeneratorType {
     
-    private var bytes: FlattenGenerator<DataRegionsView.Generator>
+    private var bytes: FlattenGenerator<DataRegions.Generator>
     
-    private init(_ bytes: FlattenCollection<DataRegionsView>) {
+    private init(_ bytes: FlattenCollection<DataRegions>) {
         self.bytes = bytes.generate()
     }
     
-    private init(_ bytes: FlattenGenerator<DataRegionsView.Generator>) {
+    private init(_ bytes: FlattenGenerator<DataRegions.Generator>) {
         self.bytes = bytes.generate()
     }
     
@@ -46,7 +46,7 @@ extension Data: SequenceType {
     
     /// Return a *generator* over the `T`s that comprise this *data*.
     public func generate() -> DataGenerator<T> {
-        return DataGenerator(bytesView)
+        return DataGenerator(bytes)
     }
     
 }
