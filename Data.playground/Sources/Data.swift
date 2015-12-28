@@ -56,7 +56,7 @@ public struct Data<T: UnsignedIntegerType> {
 
 // MARK: Internal
 
-extension Data {
+private extension Data {
     
     static func toBytes(i: Int) -> Int {
         return i / sizeof(T)
@@ -66,26 +66,17 @@ extension Data {
         return i * sizeof(T)
     }
     
-    private typealias Bytes = UnsafeBufferPointer<UInt8>
-    
-    private var startByte: Int {
+    var startByte: Int {
         return 0
     }
     
-    private var endByte: Int {
+    var endByte: Int {
         return dispatch_data_get_size(data)
-    }
-    
-    private func apply(function: (data: dispatch_data_t, range: HalfOpenInterval<Int>, buffer: Bytes) -> Bool) {
-        dispatch_data_apply(data) { (data, offset, ptr, count) -> Bool in
-            let buffer = Bytes(start: UnsafePointer(ptr), count: count)
-            return function(data: data, range: offset..<offset+count, buffer: buffer)
-        }
     }
     
 }
 
-// MARK: Collection conformances
+// MARK: Slicing
 
 extension Data {
     
