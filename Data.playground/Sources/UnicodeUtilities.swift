@@ -29,8 +29,9 @@ extension SequenceType where Generator.Element: UnsignedIntegerType {
     
 }
 
-extension CollectionType where Generator.Element: UnsignedIntegerType {
-    
+// multi-pass generators
+extension SequenceType where Generator: SequenceType, Generator.Element: UnsignedIntegerType {
+
     // h/t Swift stdlib: https://github.com/apple/swift/blob/master/stdlib/public/core/StringBuffer.swift
     public func decode<Encoding: UnicodeCodecType where Encoding.CodeUnit == Generator.Element>(encoding: Encoding.Type, repairIllFormedSequences: Bool = false, minimumCapacity: Int = 0) -> String? {
         guard let (utf16Count, isAscii) = UTF16.measure(encoding, input: generate(), repairIllFormedSequences: repairIllFormedSequences) else {
