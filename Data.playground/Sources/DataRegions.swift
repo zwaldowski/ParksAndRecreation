@@ -136,16 +136,48 @@ extension Data {
         return DataRegions(data)
     }
     
+    /// A collection view representing the byte stream making up the data.
+    public typealias Bytes = FlattenCollection<DataRegions>
+    
     /// A collection view representing the actual bytes making up the data.
     /// Enumerating through this collection, though with a performance cost,
     /// is good for presentation and debugging.
-    public var bytes: FlattenCollection<DataRegions> {
+    public var bytes: Bytes {
         return byteRegions.flatten()
     }
     
 }
 
 // MARK: Introspection
+
+private extension Data {
+    
+    func toHex64Strings(byteLimit limit: Int? = nil) -> JoinSequence<[LazyMapSequence<AnySequence<Bytes.SubSequence>, String>]> {
+        let slices: [FlattenCollection<DataRegions>.SubSequence]
+        if let limit = limit where bytes.count > limit {
+            let prefixLength = (limit + 1) / 2
+            let suffixLength = limit - prefixLength
+            slices = [ bytes.prefix(prefixLength), bytes.suffix(suffixLength) ]
+        } else {
+            slices = [ bytes[bytes.startIndex..<bytes.endIndex] ]
+        }
+        
+        return slices.lazy.map { bytes in
+            bytes.chunks(4).lazy.map { fourBytes in
+                fourBytes.lazy.map { byte -> String in
+                    let string = String(byte, radix: 16, uppercase: false)
+                    guard byte > 0xF else { return "0\(string)" }
+                    return string
+                }.joinWithSeparator("")
+            }
+        }.joinWithSeparator([ "... " ])
+    }
+    
+    func describeBytes(limit limit: Int? = nil) -> String {
+        return toHex64Strings(byteLimit: limit).joinWithSeparator(" ")
+    }
+    
+}
 
 extension Data: CustomReflectable {
     
@@ -154,8 +186,21 @@ extension Data: CustomReflectable {
         // Appears as an array of the integer type, as suggested in the docs
         // for Mirror.init(_:unlabeledChildren:displayStyle:ancestorRepresentation:).
         // An improved version might show segmented hex values.
-        let hexBytes = bytes.lazy.map { "0x" + String($0, radix: 16) }
-        return Mirror(self, unlabeledChildren: hexBytes, displayStyle: .Collection)
+        return Mirror(self, unlabeledChildren: Array(toHex64Strings()), displayStyle: .Collection)
     }
     
+}
+
+extension Data: CustomStringConvertible, CustomDebugStringConvertible {
+    
+    /// A textual representation of `self`.
+    public var description: String {
+        return "<\(describeBytes())>"
+    }
+    
+    /// A textual representation of `self`, suitable for debugging.
+    public var debugDescription: String {
+        return "<\(describeBytes(limit: 1024))>"
+    }
+
 }

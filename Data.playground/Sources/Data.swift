@@ -144,15 +144,3 @@ extension Data {
     }
     
 }
-
-
-// MARK: Introspection
-
-extension Data: CustomStringConvertible {
-    
-    /// A textual representation of `self`.
-    public var description: String {
-        return data.description
-    }
-    
-}
