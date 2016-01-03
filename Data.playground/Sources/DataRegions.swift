@@ -152,7 +152,7 @@ extension Data {
 
 private extension Data {
     
-    func toHex64Strings(byteLimit limit: Int? = nil) -> JoinSequence<[LazyMapSequence<AnySequence<Bytes.SubSequence>, String>]> {
+    func toHex64Strings(byteLimit limit: Int? = nil) -> JoinSequence<[LazyMapSequence<ChunkSequence<Bytes.SubSequence>, String>]> {
         let slices: [FlattenCollection<DataRegions>.SubSequence]
         if let limit = limit where bytes.count > limit {
             let prefixLength = (limit + 1) / 2
@@ -163,7 +163,7 @@ private extension Data {
         }
         
         return slices.lazy.map { bytes in
-            bytes.chunks(4).lazy.map { fourBytes in
+            bytes.slice(every: 4).lazy.map { fourBytes in
                 fourBytes.lazy.map { byte -> String in
                     let string = String(byte, radix: 16, uppercase: false)
                     guard byte > 0xF else { return "0\(string)" }
