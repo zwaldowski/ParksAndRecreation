@@ -25,8 +25,8 @@ public extension NSRange {
         guard location != NSNotFound else { return nil }
         
         let utfStart = characters.utf16.startIndex.advancedBy(location, limit: characters.utf16.endIndex)
-        guard utfStart != characters.utf16.endIndex else { return nil }
-        
+        guard utfStart != characters.utf16.endIndex || length == 0 else { return nil }
+
         let utfEnd = utfStart.advancedBy(length, limit: characters.utf16.endIndex)
         
         guard let start = utfStart.samePositionIn(characters),
