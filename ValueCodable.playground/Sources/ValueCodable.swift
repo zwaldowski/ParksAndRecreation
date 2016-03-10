@@ -45,21 +45,25 @@ private final class CodingBox<Value: ValueCodable>: NSObject, NSCoding {
 
 private extension NSCoder {
 
-    func byDecodingBox<Value>(@noescape body: NSKeyedUnarchiver throws -> CodingBox<Value>?) rethrows -> Value? {
+    func boxedClassNameFor(name: String) -> String {
+        return "Encoded<\(name)>"
+    }
+
+    func byDecodingBox<Value: ValueCodable>(@noescape body: NSKeyedUnarchiver throws -> CodingBox<Value>?) rethrows -> Value? {
         assert(allowsKeyedCoding)
 
         guard let archiver = self as? NSKeyedUnarchiver else { return nil }
-        archiver.setClass(CodingBox<Value>.self, forClassName: String(CodingBox<Value>.self))
+        archiver.setType(Value.self, forTypeName: String(Value.self), force: false)
 
         guard let boxed = try body(archiver) else { return nil }
         return boxed.value
     }
 
-    func encodeBox<Value>(@autoclosure withValue getValue: () -> Value, @noescape body: (NSKeyedArchiver, CodingBox<Value>) throws -> Void) rethrows {
+    func encodeBox<Value: ValueCodable>(@autoclosure withValue getValue: () -> Value, @noescape body: (NSKeyedArchiver, CodingBox<Value>) throws -> Void) rethrows {
         assert(allowsKeyedCoding)
 
         guard let archiver = self as? NSKeyedArchiver else { return }
-        archiver.setClassName(String(CodingBox<Value>.self), forClass: CodingBox<Value>.self)
+        archiver.setName(String(Value.self), forType: Value.self)
 
         return try body(archiver, .init(getValue()))
     }
@@ -145,6 +149,22 @@ extension NSKeyedUnarchiver {
         return try unarchiver.decodeTopLevelValue(forKey: NSKeyedArchiveRootObjectKey)
     }
 
+    private func setType<Value: ValueCodable>(_: Value.Type, forTypeName name: String, force: Bool) {
+        let className = boxedClassNameFor(name)
+        guard force || classForClassName(className) == nil else { return }
+        setClass(CodingBox<Value>.self, forClassName: className)
+    }
+
+    /// Adds a type translation mapping to the receiver whereby values encoded
+    /// with `name` are decoded as instances of `type` instead.
+    @available(iOS, introduced=7.0, obsoleted=10.0, message="There should be a better way.")
+    @available(OSX, introduced=10.9, obsoleted=10.12, message="There should be a better way.")
+    @available(watchOS, introduced=2.0, obsoleted=3.0, message="There should be a better way.")
+    @available(tvOS, introduced=9.0, obsoleted=10.10, message="There should be a better way.")
+    public func setType<Value: ValueCodable>(_: Value.Type, forTypeName name: String) {
+        setType(Value.self, forTypeName: name, force: true)
+    }
+
 }
 
 extension NSKeyedArchiver {
@@ -165,6 +185,16 @@ extension NSKeyedArchiver {
         }
         
         return data
+    }
+
+    /// Adds a type translation mapping to the receiver whereby instances of
+    /// `type` are encoded with `name` instead of their type names.
+    @available(iOS, introduced=7.0, obsoleted=10.0, message="There should be a better way.")
+    @available(OSX, introduced=10.9, obsoleted=10.12, message="There should be a better way.")
+    @available(watchOS, introduced=2.0, obsoleted=3.0, message="There should be a better way.")
+    @available(tvOS, introduced=9.0, obsoleted=10.10, message="There should be a better way.")
+    public func setName<Value: ValueCodable>(name: String, forType type: Value.Type = Value.self) {
+        setClassName(boxedClassNameFor(String(type)), forClass: CodingBox<Value>.self)
     }
     
 }
