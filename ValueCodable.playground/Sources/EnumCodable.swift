@@ -1,20 +1,5 @@
 import Foundation
 
-extension RawRepresentable where RawValue: NSCoding {
-
-    /// Encodes `self` using a given archiver.
-    public func encode(with coder: NSCoder) {
-        rawValue.encodeWithCoder(coder)
-    }
-
-    /// Creates an instance from from data in a given unarchiver.
-    public init?(coder: NSCoder) {
-        guard let raw = RawValue(coder: coder) else { return nil }
-        self.init(rawValue: raw)
-    }
-
-}
-
 extension RawRepresentable where RawValue: ValueCodable {
 
     /// Encodes `self` using a given archiver.
@@ -44,7 +29,7 @@ extension RawRepresentable where RawValue: SignedIntegerType {
     
 }
 
-extension RawRepresentable where RawValue == String {
+extension RawRepresentable where RawValue: _ObjectiveCBridgeable, RawValue._ObjectiveCType: NSCoding, RawValue._ObjectiveCType: NSObject {
 
     /// Encodes `self` using a given archiver.
     public func encode(with coder: NSCoder) {
