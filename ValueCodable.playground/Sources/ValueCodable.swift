@@ -1,8 +1,17 @@
 import Foundation
 
+/// Methods that a type must implement such that instances can be encoded and
+/// decoded. This capability provides the basis for archiving and distribution.
+///
+/// In keeping with object-oriented design principles, a type being encoded
+///  or decoded is responsible for encoding and decoding its storied properties.
+///
+/// - seealso: NSCoding
 @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
 public protocol ValueCodable {
+    /// Encodes `self` using a given archiver.
     func encode(with aCoder: NSCoder)
+    /// Creates an instance from from data in a given unarchiver.
     init?(coder aDecoder: NSCoder)
 }
 
@@ -56,45 +65,45 @@ private extension NSCoder {
 
 extension NSCoder {
 
+    /// Decode a Swift type that was previously encoded with
+    /// `encodeValue(_:forKey:)`.
     @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
-    public func decodeRootValue<Value: ValueCodable>(ofType type: Value.Type = Value.self) -> Value? {
+    public func decodeValue<Value: ValueCodable>(ofType _: Value.Type = Value.self, forKey key: String? = nil) -> Value? {
         return byDecodingBox {
-            $0.decodeObject() as? CodingBox<Value>
+            if let key = key {
+                return $0.decodeObjectOfClass(CodingBox<Value>.self, forKey: key)
+            } else {
+                return $0.decodeObject() as? CodingBox<Value>
+            }
         }
     }
 
+    /// Decode a Swift type at the root of a hierarchy that was previously
+    /// encoded with `encodeValue(_:forKey:)`.
+    ///
+    /// The top-level distinction is important, as `NSCoder` uses Objective-C
+    /// exceptions internally to communicate failure; here they are translated
+    /// into Swift error-handling.
     @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
-    public func decodeTopLevelRootValue<Value: ValueCodable>(ofType type: Value.Type = Value.self) throws -> Value? {
+    public func decodeTopLevelValue<Value: ValueCodable>(ofType _: Value.Type = Value.self, forKey key: String? = nil) throws -> Value? {
         return try byDecodingBox {
-            try $0.decodeTopLevelObject() as? CodingBox<Value>
+            if let key = key {
+                return try $0.decodeTopLevelObjectOfClass(CodingBox<Value>.self, forKey: key)
+            } else {
+                return try $0.decodeTopLevelObject() as? CodingBox<Value>
+            }
         }
     }
 
+    /// Encodes a `value` and associates it with a given `key`.
     @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
-    public func decodeValue<Value: ValueCodable>(ofType type: Value.Type = Value.self, forKey key: String) -> Value? {
-        return byDecodingBox {
-            $0.decodeObjectOfClass(CodingBox<Value>.self, forKey: key)
-        }
-    }
-
-    @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
-    public func decodeTopLevelValue<Value: ValueCodable>(ofType type: Value.Type = Value.self, forKey key: String) throws -> Value? {
-        return try byDecodingBox {
-            try $0.decodeTopLevelObjectOfClass(CodingBox<Value>.self, forKey: key)
-        }
-    }
-
-    @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
-    public func encodeRootValue<Value: ValueCodable>(value: Value) {
+    public func encodeValue<Value: ValueCodable>(value: Value, forKey key: String? = nil) {
         encodeBox(withValue: value) {
-            $0.encodeRootObject($1)
-        }
-    }
-
-    @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
-    public func encodeValue<Value: ValueCodable>(value: Value, forKey key: String) {
-        encodeBox(withValue: value) {
-            $0.encodeObject($1, forKey: key)
+            if let key = key {
+                $0.encodeObject($1, forKey: key)
+            } else {
+                $0.encodeRootObject($1)
+            }
         }
     }
 
@@ -102,23 +111,27 @@ extension NSCoder {
 
 extension NSKeyedUnarchiver {
 
+    /// Decodes and returns the tree of values previously encoded into `data`.
     @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
-    public class func unarchivedRootValue<Value: ValueCodable>(ofType type: Value.Type = Value.self, withData data: NSData) throws -> Value? {
+    public class func unarchivedValue<Value: ValueCodable>(ofType type: Value.Type = Value.self, withData data: NSData) throws -> Value? {
         let unarchiver = self.init(forReadingWithData: data)
-        return try unarchiver.decodeTopLevelRootValue()
+        defer { unarchiver.finishDecoding() }
+        return try unarchiver.decodeTopLevelValue(forKey: NSKeyedArchiveRootObjectKey)
     }
 
 }
 
 extension NSKeyedArchiver {
 
+    /// Returns a data object containing the encoded form of the instances whose
+    /// root `value` is given.
     @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
-    public class func archivedData<Value: ValueCodable>(withRootValue rootValue: Value) -> NSData {
+    public class func archivedData<Value: ValueCodable>(withValue value: Value) -> NSData {
         let data = NSMutableData()
 
         autoreleasepool {
             let archiver = self.init(forWritingWithMutableData: data)
-            archiver.encodeRootValue(rootValue)
+            archiver.encodeValue(value, forKey: NSKeyedArchiveRootObjectKey)
             archiver.finishEncoding()
         }
         

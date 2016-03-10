@@ -31,7 +31,7 @@ extension ColorChoice: ValueCodable {
             coder.encodeInteger(Tag.Blue.rawValue, forKey: Keys.Tag.rawValue)
         case .Other(let text):
             coder.encodeInteger(Tag.Other.rawValue, forKey: Keys.Tag.rawValue)
-            coder.encodeObject(text, forKey: Keys.OtherText.rawValue)
+            coder.encodeValue(text, forKey: Keys.OtherText.rawValue)
         }
     }
 
@@ -45,7 +45,7 @@ extension ColorChoice: ValueCodable {
         case .Blue:
             self = .Blue
         case .Other:
-            guard let text = coder.decodeObjectForKey(Keys.OtherText.rawValue) as? String else { return nil }
+            guard let text = coder.decodeValue(ofType: String.self, forKey: Keys.OtherText.rawValue) else { return nil }
             self = .Other(text)
         }
     }
@@ -64,12 +64,12 @@ extension Person: ValueCodable {
     }
 
     func encode(with coder: NSCoder) {
-        coder.encodeObject(fullName, forKey: Keys.FullName.rawValue)
+        coder.encodeValue(fullName, forKey: Keys.FullName.rawValue)
         coder.encodeValue(favoriteColor, forKey: Keys.FavoriteColor.rawValue)
     }
 
     init?(coder aDecoder: NSCoder) {
-        guard let fullName = aDecoder.decodeObjectForKey(Keys.FullName.rawValue) as? String,
+        guard let fullName = aDecoder.decodeValue(ofType: String.self, forKey: Keys.FullName.rawValue),
             favoriteColor = aDecoder.decodeValue(ofType: ColorChoice.self, forKey: Keys.FavoriteColor.rawValue) else { return nil }
         self.fullName = fullName
         self.favoriteColor = favoriteColor
@@ -81,9 +81,9 @@ let value1 = Person(fullName: "Zachary Waldowski", favoriteColor: .Red)
 let value2 = Person(fullName: "Christian Keur", favoriteColor: .Other("Taupe"))
 
 let data1 = NSKeyedArchiver.archivedData(withRootValue: value1)
-let newValue1 = try! NSKeyedUnarchiver.unarchivedRootValue(ofType: Person.self, withData: data1)!
+let newValue1 = try! NSKeyedUnarchiver.unarchivedValue(ofType: Person.self, withData: data1)!
 print(newValue1)
 
 let data2 = NSKeyedArchiver.archivedData(withRootValue: value2)
-let newValue2 = try! NSKeyedUnarchiver.unarchivedRootValue(ofType: Person.self, withData: data2)!
+let newValue2 = try! NSKeyedUnarchiver.unarchivedValue(ofType: Person.self, withData: data2)!
 print(newValue2)
