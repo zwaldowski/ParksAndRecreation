@@ -7,7 +7,10 @@ import Foundation
 ///  or decoded is responsible for encoding and decoding its storied properties.
 ///
 /// - seealso: NSCoding
-@available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
+@available(iOS, introduced=7.0, obsoleted=10.0, message="There should be a better way.")
+@available(OSX, introduced=10.9, obsoleted=10.12, message="There should be a better way.")
+@available(watchOS, introduced=2.0, obsoleted=3.0, message="There should be a better way.")
+@available(tvOS, introduced=9.0, obsoleted=10.10, message="There should be a better way.")
 public protocol ValueCodable {
     /// Encodes `self` using a given archiver.
     func encode(with aCoder: NSCoder)
@@ -67,7 +70,10 @@ extension NSCoder {
 
     /// Decode a Swift type that was previously encoded with
     /// `encodeValue(_:forKey:)`.
-    @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
+    @available(iOS, introduced=7.0, obsoleted=10.0, message="There should be a better way.")
+    @available(OSX, introduced=10.9, obsoleted=10.12, message="There should be a better way.")
+    @available(watchOS, introduced=2.0, obsoleted=3.0, message="There should be a better way.")
+    @available(tvOS, introduced=9.0, obsoleted=10.10, message="There should be a better way.")
     public func decodeValue<Value: ValueCodable>(ofType _: Value.Type = Value.self, forKey key: String? = nil) -> Value? {
         return byDecodingBox {
             if let key = key {
@@ -84,7 +90,10 @@ extension NSCoder {
     /// The top-level distinction is important, as `NSCoder` uses Objective-C
     /// exceptions internally to communicate failure; here they are translated
     /// into Swift error-handling.
-    @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
+    @available(iOS, introduced=9.0, obsoleted=10.0, message="There should be a better way.")
+    @available(OSX, introduced=10.10, obsoleted=10.12, message="There should be a better way.")
+    @available(watchOS, introduced=2.0, obsoleted=3.0, message="There should be a better way.")
+    @available(tvOS, introduced=9.0, obsoleted=10.10, message="There should be a better way.")
     public func decodeTopLevelValue<Value: ValueCodable>(ofType _: Value.Type = Value.self, forKey key: String? = nil) throws -> Value? {
         return try byDecodingBox {
             if let key = key {
@@ -96,7 +105,10 @@ extension NSCoder {
     }
 
     /// Encodes a `value` and associates it with a given `key`.
-    @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
+    @available(iOS, introduced=7.0, obsoleted=10.0, message="There should be a better way.")
+    @available(OSX, introduced=10.9, obsoleted=10.12, message="There should be a better way.")
+    @available(watchOS, introduced=2.0, obsoleted=3.0, message="There should be a better way.")
+    @available(tvOS, introduced=9.0, obsoleted=10.10, message="There should be a better way.")
     public func encodeValue<Value: ValueCodable>(value: Value, forKey key: String? = nil) {
         encodeBox(withValue: value) {
             if let key = key {
@@ -112,8 +124,22 @@ extension NSCoder {
 extension NSKeyedUnarchiver {
 
     /// Decodes and returns the tree of values previously encoded into `data`.
-    @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
-    public class func unarchivedValue<Value: ValueCodable>(ofType type: Value.Type = Value.self, withData data: NSData) throws -> Value? {
+    @available(iOS, introduced=7.0, obsoleted=10.0, message="There should be a better way.")
+    @available(OSX, introduced=10.9, obsoleted=10.12, message="There should be a better way.")
+    @available(watchOS, introduced=2.0, obsoleted=3.0, message="There should be a better way.")
+    @available(tvOS, introduced=9.0, obsoleted=10.10, message="There should be a better way.")
+    public class func unarchivedValue<Value: ValueCodable>(ofType type: Value.Type = Value.self, withData data: NSData) -> Value? {
+        let unarchiver = self.init(forReadingWithData: data)
+        defer { unarchiver.finishDecoding() }
+        return unarchiver.decodeValue(forKey: NSKeyedArchiveRootObjectKey)
+    }
+
+    /// Decodes and returns the tree of values previously encoded into `data`.
+    @available(iOS, introduced=9.0, obsoleted=10.0, message="There should be a better way.")
+    @available(OSX, introduced=10.10, obsoleted=10.12, message="There should be a better way.")
+    @available(watchOS, introduced=2.0, obsoleted=3.0, message="There should be a better way.")
+    @available(tvOS, introduced=9.0, obsoleted=10.10, message="There should be a better way.")
+    public class func unarchivedTopLevelValue<Value: ValueCodable>(ofType type: Value.Type = Value.self, withData data: NSData) throws -> Value? {
         let unarchiver = self.init(forReadingWithData: data)
         defer { unarchiver.finishDecoding() }
         return try unarchiver.decodeTopLevelValue(forKey: NSKeyedArchiveRootObjectKey)
@@ -125,7 +151,10 @@ extension NSKeyedArchiver {
 
     /// Returns a data object containing the encoded form of the instances whose
     /// root `value` is given.
-    @available(iOS, introduced=8.0, obsoleted=10.0, message="There should be a better way.")
+    @available(iOS, introduced=7.0, obsoleted=10.0, message="There should be a better way.")
+    @available(OSX, introduced=10.9, obsoleted=10.12, message="There should be a better way.")
+    @available(watchOS, introduced=2.0, obsoleted=3.0, message="There should be a better way.")
+    @available(tvOS, introduced=9.0, obsoleted=10.10, message="There should be a better way.")
     public class func archivedData<Value: ValueCodable>(withValue value: Value) -> NSData {
         let data = NSMutableData()
 
