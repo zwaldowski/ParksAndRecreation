@@ -7,94 +7,96 @@
 
 import Foundation
 
-public struct MatchGroup: CustomReflectable, CustomStringConvertible, CustomDebugStringConvertible {
+public struct MatchGroup: CollectionType, CustomReflectable, CustomStringConvertible, CustomDebugStringConvertible {
     
     private let result: NSTextCheckingResult
-    private let string: String
-    
-    private init(result: NSTextCheckingResult, within characters: String) {
+    private let source: String
+
+    private init(result: NSTextCheckingResult, within source: String) {
         self.result = result
-        self.string = characters
+        self.source = source
     }
     
     public var range: Range<String.Index> {
         // From NSRegularExpression: "A result must have at least one range, but
         // may optionally have more (for example, to represent capture groups).
         // The range at index 0 always matches the range property."
-        return result.range.sameRangeIn(string)!
+        return result.range.sameRangeIn(source)!
     }
-    
-    public var substring: String {
-        return string[range]
+
+    private func substringForRange(range: NSRange) -> String? {
+        return range.sameRangeIn(source).map { source[$0] }
     }
-    
+
+    public var startIndex: Int {
+        return 1
+    }
+
+    public var endIndex: Int {
+        return result.numberOfRanges
+    }
+
+    public subscript(i: Int) -> String? {
+        let range = result.rangeAtIndex(i)
+        return substringForRange(range)
+    }
+
     public var ranges: LazyMapCollection<Range<Int>, Range<String.Index>?> {
-        return (1 ..< result.numberOfRanges).lazy.map { [result, string] in
-            let range = result.rangeAtIndex($0.successor())
-            return range.sameRangeIn(string)
-        }
-    }
-    
-    public var substrings: LazyMapCollection<Range<Int>, String?> {
-        return (1 ..< result.numberOfRanges).lazy.map { [result, string] in
-            let range = result.rangeAtIndex($0.successor())
-            return range.sameRangeIn(string).map { string[$0] }
+        return indices.lazy.map {
+            self.result.rangeAtIndex($0).sameRangeIn(self.source)
         }
     }
     
     public var description: String {
-        return "range: \(range), substring: \"\(substring)\""
+        return substringForRange(result.range) ?? ""
     }
     
     public var debugDescription: String {
-        return String(result)
+        return "range: \(range), text: \"\(String(self))\""
     }
     
     public func customMirror() -> Mirror {
         return Mirror(self, children: [
             "range": String(range),
-            "substring": substring
-        ], displayStyle: .Struct, ancestorRepresentation: .Suppressed)
+            "substring": String(self)
+        ], displayStyle: .Struct)
     }
     
 }
 
-public extension NSRegularExpression {
-    
-    private func searchRange(range: Range<String.Index>?, within characters: String) -> NSRange {
-        return range.map {
-            NSRange($0, within: characters)
-        } ?? NSRange(location: 0, length: characters.utf16.count)
+extension String {
+
+    private func searchRange(range: Range<String.Index>?) -> NSRange {
+        return range.map { NSRange($0, within: self) } ?? NSRange(0 ..< utf16.count)
     }
-    
-    func firstMatch(within string: String, options: NSMatchingOptions = [], range: Range<String.Index>? = nil) -> MatchGroup? {
-        return firstMatchInString(string, options: options, range: searchRange(range, within: string)).map {
-            MatchGroup(result: $0, within: string)
+
+    public func match(regex: NSRegularExpression, range: Range<String.Index>? = nil, options: NSMatchingOptions = []) -> MatchGroup? {
+        return regex.firstMatchInString(self, options: options, range: searchRange(range)).map {
+            MatchGroup(result: $0, within: self)
         }
     }
-    
-    func numberOfMatches(within string: String, options: NSMatchingOptions = [], range: Range<String.Index>? = nil) -> Int {
-        return numberOfMatchesInString(string, options: options, range: searchRange(range, within: string))
+
+    public func numberOfMatches(regex: NSRegularExpression, range: Range<String.Index>? = nil, options: NSMatchingOptions = []) -> Int {
+        return regex.numberOfMatchesInString(self, options: options, range: searchRange(range))
     }
-    
-    func matches(within string: String, options: NSMatchingOptions = [], range: Range<String.Index>? = nil) -> LazyMapCollection<[NSTextCheckingResult], MatchGroup> {
-        let matches = matchesInString(string, options: options, range: searchRange(range, within: string))
-        return matches.lazy.map {
-            MatchGroup(result: $0, within: string)
+
+    public func matches(regex: NSRegularExpression, range: Range<String.Index>? = nil, options: NSMatchingOptions = []) -> [MatchGroup] {
+        return regex.matchesInString(self, options: options, range: searchRange(range)).map {
+            MatchGroup(result: $0, within: self)
         }
     }
-    
-    func splitMatches(within string: String, options: NSMatchingOptions = [], range: Range<String.Index>? = nil) -> [String] {
-        let matches = self.matches(within: string, options: options, range: range)
-        var start = range?.startIndex ?? string.startIndex
-        let end = range?.endIndex ?? string.endIndex
+
+    public func splitMatches(regex: NSRegularExpression, range: Range<String.Index>? = nil, options: NSMatchingOptions = []) -> [String] {
+        let matches = self.matches(regex, range: range, options: options)
+        var start = range?.startIndex ?? startIndex
+        let end = range?.endIndex ?? endIndex
         var splits = [String]()
         splits.reserveCapacity(matches.count + 1)
         for match in matches {
-            splits.append(string[start..<match.range.startIndex])
+            splits.append(self[start..<match.range.startIndex])
             start = match.range.endIndex
         }
-        splits.append(string[start..<end])
+        splits.append(self[start..<end])
         return splits
     }
     

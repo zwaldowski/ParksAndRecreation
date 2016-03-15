@@ -53,7 +53,7 @@ s[range]
 
 // MARK: Swift String
 
-if let match = regex.firstMatch(within: s) {
+if let match = s.match(regex) {
     match.range
-    match.substring
+    String(match)
 }
