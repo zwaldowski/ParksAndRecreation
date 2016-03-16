@@ -269,7 +269,7 @@ extension OrderedDictionary: CustomStringConvertible, CustomDebugStringConvertib
     }
 
     public var debugDescription: String {
-        return makeDescription(debug: false)
+        return makeDescription(debug: true)
     }
     
 }
