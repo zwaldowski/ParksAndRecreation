@@ -88,6 +88,22 @@ extension NSCoder {
         }
     }
 
+    public func decodeDynamicValue<Value, T0: ValueCodable, T1: ValueCodable>(ofType _: Value.Type, forKey key: String, _ t0: T0.Type, _ t1: T1.Type) -> Value? {
+        guard let archiver = self as? NSKeyedUnarchiver else { return nil }
+        archiver.setType(T0.self, forTypeName: String(T0.self), force: false)
+        archiver.setType(T1.self, forTypeName: String(T1.self), force: false)
+
+        return decodeObjectOfClasses([CodingBox<T0>.self, CodingBox<T1>.self], forKey: key).flatMap { decoded in
+            if let t0 = decoded as? CodingBox<T0> {
+                return t0.value as? Value
+            }
+            if let t1 = decoded as? CodingBox<T1> {
+                return t1.value as? Value
+            }
+            return nil
+        }
+    }
+
     /// Decode a Swift type at the root of a hierarchy that was previously
     /// encoded with `encodeValue(_:forKey:)`.
     ///
@@ -123,6 +139,10 @@ extension NSCoder {
         }
     }
 
+    public func encodeDynamicValue<T, Value: ValueCodable>(value: T, asType _: Value.Type, forKey key: String? = nil) {
+        guard let value = value as? Value else { return }
+        encodeValue(value, forKey: key)
+    }
 }
 
 extension NSKeyedUnarchiver {

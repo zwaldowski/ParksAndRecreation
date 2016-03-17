@@ -108,18 +108,58 @@ enum Zodiac: UnicodeScalar, ValueCodable {
     case Pisces = "♓"
 }
 
+protocol DummyProtocolObject: ValueCodable {
+    var x: Int { get }
+}
+
+extension DummyProtocolObject {
+    func encodeDynamic(with coder: NSCoder, forKey key: String) {
+        coder.encodeDynamicValue(self, asType: self.dynamicType, forKey: key)
+    }
+
+}
+
+struct Foo: DummyProtocolObject {
+    let x: Int
+
+    init() { x = 1 }
+
+    func encode(with aCoder: NSCoder) {
+        aCoder.encodeInteger(x, forKey: "x")
+    }
+
+    init?(coder aDecoder: NSCoder) {
+        x = aDecoder.decodeIntegerForKey("x")
+    }
+}
+
+struct Bar: DummyProtocolObject {
+    let x: Int
+
+    init() { x = 2 }
+
+    func encode(with aCoder: NSCoder) {
+        aCoder.encodeInteger(x, forKey: "x")
+    }
+
+    init?(coder aDecoder: NSCoder) {
+        x = aDecoder.decodeIntegerForKey("x")
+    }
+}
+
 /// Custom struct conforming to ValueCodable.
 struct Person {
     let fullName: String
     let favoriteColor: ColorChoice
     let weightClass: WeightClass
     let zodiacSign: Zodiac
+    let dummy: DummyProtocolObject
 }
 
 extension Person: ValueCodable, Equatable {
 
     private enum Keys: String {
-        case FullName, FavoriteColor, WeightClass, ZodiacSign
+        case FullName, FavoriteColor, WeightClass, ZodiacSign, Dummy
     }
 
     func encode(with coder: NSCoder) {
@@ -127,17 +167,20 @@ extension Person: ValueCodable, Equatable {
         coder.encodeValue(favoriteColor, forKey: Keys.FavoriteColor.rawValue)
         coder.encodeValue(weightClass, forKey: Keys.WeightClass.rawValue)
         coder.encodeValue(zodiacSign, forKey: Keys.ZodiacSign.rawValue)
+        dummy.encodeDynamic(with: coder, forKey: "dummy")
     }
 
     init?(coder aDecoder: NSCoder) {
         guard let fullName = aDecoder.decodeValue(ofType: String.self, forKey: Keys.FullName.rawValue),
             favoriteColor = aDecoder.decodeValue(ofType: ColorChoice.self, forKey: Keys.FavoriteColor.rawValue),
             weightClass = aDecoder.decodeValue(ofType: WeightClass.self, forKey: Keys.WeightClass.rawValue),
-            zodiacSign = aDecoder.decodeValue(ofType: Zodiac.self, forKey: Keys.ZodiacSign.rawValue) else { return nil }
+            zodiacSign = aDecoder.decodeValue(ofType: Zodiac.self, forKey: Keys.ZodiacSign.rawValue),
+            dummy = aDecoder.decodeDynamicValue(ofType: DummyProtocolObject.self, forKey: "dummy", Foo.self, Bar.self) else { return nil }
         self.fullName = fullName
         self.favoriteColor = favoriteColor
         self.weightClass = weightClass
         self.zodiacSign = zodiacSign
+        self.dummy = dummy
     }
 
 }
@@ -150,8 +193,8 @@ func ==(lhs: Person, rhs: Person) -> Bool {
 
 let taupe = UIColor(red: 0.28, green: 0.24, blue: 0.20, alpha: 1.0)
 
-let value1 = Person(fullName: "Zachary Waldowski", favoriteColor: .Blue, weightClass: .Heavy, zodiacSign: .Taurus)
-let value2 = Person(fullName: "Christian Keur", favoriteColor: .Other(taupe), weightClass: .Welter, zodiacSign: .Virgo)
+let value1 = Person(fullName: "Zachary Waldowski", favoriteColor: .Blue, weightClass: .Heavy, zodiacSign: .Taurus, dummy: Foo())
+let value2 = Person(fullName: "Christian Keur", favoriteColor: .Other(taupe), weightClass: .Welter, zodiacSign: .Virgo, dummy: Bar())
 
 let data1 = NSKeyedArchiver.archivedData(withValue: value1)
 let newValue1 = NSKeyedUnarchiver.unarchivedValue(ofType: Person.self, withData: data1)!
