@@ -26,8 +26,8 @@ public extension CGRect {
         }
     }
     
-    mutating func divide(atDistance: CGFloat, fromEdge edge: CGRectEdge = .MinYEdge) -> CGRect {
-        let (slice, remainder) = rectsByDividing(atDistance, fromEdge: edge)
+    mutating func dividing(atDistance distance: CGFloat, fromEdge edge: CGRectEdge = .MinYEdge) -> CGRect {
+        let (slice, remainder) = divide(distance, fromEdge: edge)
         self = remainder
         return slice
     }

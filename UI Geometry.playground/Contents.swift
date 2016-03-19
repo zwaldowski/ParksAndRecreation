@@ -23,12 +23,12 @@ let separatorRect5 = baseRect.rectForEdge(.MaxYEdge, thickness: demoView.hairlin
 
 //: Mutating version of rect divide (for iterative processes)
 var dividingRect = baseRect
-let slice1 = dividingRect.divide(24, fromEdge: .MinYEdge)
-let slice2 = dividingRect.divide(24, fromEdge: .MinYEdge)
-let slice3 = dividingRect.divide(24, fromEdge: .MinYEdge)
-let slice4 = dividingRect.divide(24, fromEdge: .MinYEdge)
-let slice5 = dividingRect.divide(24, fromEdge: .MinYEdge)
-let slice6 = dividingRect.divide(24, fromEdge: .MinYEdge)
+let slice1 = dividingRect.dividing(atDistance: 24, fromEdge: .MinYEdge)
+let slice2 = dividingRect.dividing(atDistance: 24, fromEdge: .MinYEdge)
+let slice3 = dividingRect.dividing(atDistance: 24, fromEdge: .MinYEdge)
+let slice4 = dividingRect.dividing(atDistance: 24, fromEdge: .MinYEdge)
+let slice5 = dividingRect.dividing(atDistance: 24, fromEdge: .MinYEdge)
+let slice6 = dividingRect.dividing(atDistance: 24, fromEdge: .MinYEdge)
 dividingRect
 
 //: Integration

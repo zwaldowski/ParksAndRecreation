@@ -50,4 +50,4 @@ try! context.save()
 
 let fr = NSFetchRequest(entityName: Test.entityName)
 fr.fetchBatchSize = 1
-let arr = (try! context.executeFetchRequest(fr))
+let arr = try! context.executeFetchRequest(fr)

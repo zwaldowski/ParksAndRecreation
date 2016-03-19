@@ -52,7 +52,7 @@ public extension CATransform3D {
     }
     
     init<Sequence: SequenceType where Sequence.Generator.Element == CGAffineTransform>(transforms: Sequence) {
-        self.init(transforms: lazy(transforms).map(CATransform3D.init))
+        self.init(transforms: transforms.lazy.map(CATransform3D.init))
     }
     
     init(_ transforms: CATransform3D...) {
