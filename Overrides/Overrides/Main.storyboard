@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9532" systemVersion="15E64a" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="WR6-E8-XfK">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
+    </dependencies>
+    <scenes>
+        <!--Demo View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="DemoViewController" customModule="Overrides" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Diagonal" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bDQ-th-cBT">
+                                <rect key="frame" x="272" y="308" width="57" height="17"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Current Horizontal Size Class" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Od2-19-aAv">
+                                <rect key="frame" x="192" y="280" width="217" height="19.5"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Frobdinator 4G" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VHA-EF-nf1">
+                                <rect key="frame" x="251" y="333" width="98" height="17"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="centerY" secondItem="Od2-19-aAv" secondAttribute="bottom" id="Hoy-vj-gFP"/>
+                            <constraint firstItem="VHA-EF-nf1" firstAttribute="centerX" secondItem="bDQ-th-cBT" secondAttribute="centerX" id="KAS-eE-MRw"/>
+                            <constraint firstItem="VHA-EF-nf1" firstAttribute="top" secondItem="bDQ-th-cBT" secondAttribute="bottom" constant="8" symbolic="YES" id="NhZ-II-yjR"/>
+                            <constraint firstAttribute="centerX" secondItem="Od2-19-aAv" secondAttribute="centerX" id="gnC-NQ-dAT"/>
+                            <constraint firstItem="bDQ-th-cBT" firstAttribute="top" secondItem="Od2-19-aAv" secondAttribute="bottom" constant="8" symbolic="YES" id="svh-WC-ezg"/>
+                            <constraint firstItem="Od2-19-aAv" firstAttribute="centerX" secondItem="bDQ-th-cBT" secondAttribute="centerX" id="xRr-dF-sCX"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="deviceLabel" destination="VHA-EF-nf1" id="7y5-1U-BCF"/>
+                        <outlet property="sizeClassLabel" destination="bDQ-th-cBT" id="SDZ-1S-qWj"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1561" y="197"/>
+        </scene>
+        <!--Root View Controller-->
+        <scene sceneID="fBx-Bt-9pr">
+            <objects>
+                <viewController id="WR6-E8-XfK" userLabel="Root View Controller" customClass="OverrideRootViewController" customModule="Overrides" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="N4l-4v-Dj6"/>
+                        <viewControllerLayoutGuide type="bottom" id="zaY-s5-Kfu"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="xeC-jC-yYO">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kOs-Xu-P4Y">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <connections>
+                                    <segue destination="BYZ-38-t0r" kind="embed" id="n0w-E3-FPz"/>
+                                </connections>
+                            </containerView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="kOs-Xu-P4Y" firstAttribute="height" secondItem="xeC-jC-yYO" secondAttribute="height" id="3oh-c5-HLe"/>
+                            <constraint firstAttribute="centerY" secondItem="kOs-Xu-P4Y" secondAttribute="centerY" id="DL5-q1-E2T"/>
+                            <constraint firstItem="kOs-Xu-P4Y" firstAttribute="width" secondItem="xeC-jC-yYO" secondAttribute="width" id="On4-AZ-u9T"/>
+                            <constraint firstAttribute="centerX" secondItem="kOs-Xu-P4Y" secondAttribute="centerX" id="rQB-xL-OyN"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="3hM-gK-XRE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="901" y="197"/>
+        </scene>
+    </scenes>
+</document>
