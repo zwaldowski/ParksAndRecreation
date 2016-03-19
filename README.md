@@ -55,6 +55,15 @@ An extension on `UIViewController` providing a `keyboardLayoutGuide` property. T
 
 Requires iOS 9.0.
 
+### [String Tokenization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/LineParagraphs.playground)
+
+Line, paragraph, sentence, and word views for `Swift.String`, providing alternatives to `String.enumerateSubstringsInRange(_:options:_:)`.
+
+```swift
+Array(string.lines)            // -> [Range<String.Index>]
+Array(string.lines.substrings) // -> [String]
+```
+
 ### [String Localization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Localize.playground)
 
 Formatted localization using Swift string formatting. Introduces `localize` with
@@ -92,6 +101,14 @@ using `UIControl`, but for weakly held objects and without unsafe selectors.
 
 Heavily inspired by [this blog post](http://oleb.net/blog/2014/07/swift-instance-methods-curried-functions/) from @ole.
 
+### [Ordered Dictionary](https://github.com/zwaldowski/ParksAndRecreation/blob/master/OrderedDictionary.playground)
+
+A simple glueing together of `Swift.Dictionary` and `Swift.String` into an ordered, hashed data structure. Useful if your keys are indeed already `Hashable`, but doesn't have great performance; insertion and removal tend towards the worst of both structures. If you have any alternative, prefer something [B-Tree based](https://github.com/lorentey/BTree/blob/master/Sources/Map.swift) instead.
+
+### [Custom Size Classes](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Overrides)
+
+"Size classes are fine, but I can't customize them!" Yeah, you can! By inspecting what Mobile Safari does, you can do the same, using override trait collections.
+
 ### [Regular Expressions](https://github.com/zwaldowski/ParksAndRecreation/blob/master/RegularExpression.playground)
 
 Simple Swift bridging for [`NSRegularExpression`](https://developer.apple.com/library/mac/documentation/Foundation/Reference/NSRegularExpression_Class/), as well as general patterns to go from `String.UTF16View` and `Range<String.UTF16Index>` to `NSString` and `NSRange`.
@@ -100,6 +117,10 @@ Simple Swift bridging for [`NSRegularExpression`](https://developer.apple.com/li
 
 Conveniences for using Core Graphics types in UI programming, such as retina-friendly
 rounding and equation operators that account for floating point inaccuracy.
+
+### [Value Codable](https://github.com/zwaldowski/ParksAndRecreation/blob/master/ValueCodable.playground)
+
+A simple bridge (intended for just Swift 2.x) to bridges concrete value types into `NSCoding`.
 
 ### [View Recursion](https://github.com/zwaldowski/ParksAndRecreation/blob/master/ViewRecursion.playground)
 
