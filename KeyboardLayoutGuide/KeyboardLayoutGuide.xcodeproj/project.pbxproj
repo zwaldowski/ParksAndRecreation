@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB5400381CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5400371CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift */; };
+		DBD8AFE51CEE3DBD00299E39 /* LayoutOnlyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBD8AFE41CEE3DBD00299E39 /* LayoutOnlyView.swift */; };
 		DBDA20321B89FFFC008DAC57 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDA20311B89FFFC008DAC57 /* AppDelegate.swift */; };
 		DBDA20341B89FFFC008DAC57 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDA20331B89FFFC008DAC57 /* ViewController.swift */; };
 		DBDA20371B89FFFC008DAC57 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DBDA20351B89FFFC008DAC57 /* Main.storyboard */; };
@@ -16,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DB5400371CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIScrollView+KeyboardAvoidance.swift"; sourceTree = "<group>"; };
+		DBD8AFE41CEE3DBD00299E39 /* LayoutOnlyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayoutOnlyView.swift; sourceTree = "<group>"; };
 		DBDA202E1B89FFFC008DAC57 /* KeyboardLayoutGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeyboardLayoutGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBDA20311B89FFFC008DAC57 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DBDA20331B89FFFC008DAC57 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -57,8 +61,10 @@
 			isa = PBXGroup;
 			children = (
 				DBDA20311B89FFFC008DAC57 /* AppDelegate.swift */,
-				DBDA20541B8A000A008DAC57 /* KeyboardLayoutGuide.swift */,
 				DBDA20331B89FFFC008DAC57 /* ViewController.swift */,
+				DBDA20541B8A000A008DAC57 /* KeyboardLayoutGuide.swift */,
+				DBD8AFE41CEE3DBD00299E39 /* LayoutOnlyView.swift */,
+				DB5400371CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift */,
 				DBDA203B1B89FFFC008DAC57 /* Assets.xcassets */,
 				DBDA203D1B89FFFC008DAC57 /* LaunchScreen.storyboard */,
 				DBDA20351B89FFFC008DAC57 /* Main.storyboard */,
@@ -137,6 +143,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB5400381CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift in Sources */,
+				DBD8AFE51CEE3DBD00299E39 /* LayoutOnlyView.swift in Sources */,
 				DBDA20341B89FFFC008DAC57 /* ViewController.swift in Sources */,
 				DBDA20551B8A000A008DAC57 /* KeyboardLayoutGuide.swift in Sources */,
 				DBDA20321B89FFFC008DAC57 /* AppDelegate.swift in Sources */,
