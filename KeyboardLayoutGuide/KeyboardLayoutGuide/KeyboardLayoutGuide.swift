@@ -25,8 +25,6 @@ public protocol KeyboardLayoutGuide: UILayoutSupport {
 
 // MARK: Generic implementation
 
-private let KeyboardUserInfoIsDismissingKey = "DZWKeyboardIsDismissing"
-
 private protocol KeyboardLayoutGuidePrivate: KeyboardLayoutGuide {
 
     var owningView: UIView? { get }
@@ -39,7 +37,6 @@ private final class KeyboardLayoutGuideSupport: NSObject {
     let notificationCenter: NSNotificationCenter
 
     var registeredForNotifications = false
-    var isDisappearing = false
     var bottomToContainerConstraint: NSLayoutConstraint?
 
     init(owner: KeyboardLayoutGuidePrivate, notificationCenter: NSNotificationCenter) {
@@ -56,8 +53,6 @@ private final class KeyboardLayoutGuideSupport: NSObject {
 
     func activate() {
         activateConstraints()
-
-        isDisappearing = false
 
         guard !registeredForNotifications else { return }
         defer { registeredForNotifications = true }
@@ -101,40 +96,20 @@ private final class KeyboardLayoutGuideSupport: NSObject {
         bottomToContainerConstraint = bottomToContainer
     }
 
-    func updateKeyboard(info info: KeyboardInfo?) {
-        guard !isDisappearing, let view = owner.owningView else { return }
+    func updateKeyboard(info info: KeyboardInfo) {
+        guard info.isLocal, let view = owner.owningView where !view.isEffectivelyDisappearing else { return }
 
-        let constant: CGFloat
-        if !view.isEffectivelyInPopover, let overlap = info?.overlap(in: view) {
-            constant = overlap
-        } else {
-            constant = 0
-        }
-
+        let constant = info.overlap(in: view)
         guard constant != bottomToContainerConstraint?.constant else { return }
         bottomToContainerConstraint?.constant = constant
 
-        UIView.beginAnimations(nil, context: nil)
-        defer { UIView.commitAnimations() }
+        info.animate(view.layoutIfNeeded)
 
-        UIView.setAnimationDuration(info?.animationDuration ?? 0.25)
-        UIView.setAnimationCurve(info?.animationCurve ?? .EaseInOut)
-
-        view.layoutIfNeeded()
         owner.avoidFirstResponderInScrollView?.scrollFirstResponderToVisible(animated: true)
     }
 
     @objc func adjustForKeyboard(notificationUserInfo userInfo: [NSObject: AnyObject]?) {
-        let info = KeyboardInfo(userInfo: userInfo)
-
-        if owner.owningView == nil || owner.owningView?.isEffectivelyDisappearing == true {
-            self.isDisappearing = true
-            return
-        } else if info?.isLocal == false {
-            return
-        }
-
-        updateKeyboard(info: info)
+        updateKeyboard(info: .init(userInfo: userInfo))
     }
 
     @objc func noteKeyboardWillShow(note: NSNotification) {
@@ -143,9 +118,7 @@ private final class KeyboardLayoutGuideSupport: NSObject {
     }
 
     @objc func noteKeyboardWillHide(note: NSNotification) {
-        var userInfo = note.userInfo
-        userInfo?[KeyboardUserInfoIsDismissingKey] = true
-        performSelector(#selector(adjustForKeyboard), withObject: userInfo, afterDelay: 0, inModes: [ NSRunLoopCommonModes ])
+        performSelector(#selector(adjustForKeyboard), withObject: nil, afterDelay: 0)
     }
 
     @objc func noteKeyboardDidChangeFrame(note: NSNotification) {
@@ -314,37 +287,37 @@ private extension NSLayoutConstraint {
 private struct KeyboardInfo {
 
     let animationDuration: NSTimeInterval
-    let animationCurve: UIViewAnimationCurve
-    let endFrame: CGRect
+    let animationCurve: UIViewAnimationOptions
+    let endFrame: CGRect?
     let isLocal: Bool
 
-    let forDismissing: Bool
-
-    init?(userInfo: [NSObject: AnyObject]?) {
-        guard let userInfo = userInfo,
-            duration = userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSTimeInterval,
-            curve = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? Int,
-            endFrame = userInfo[UIKeyboardFrameEndUserInfoKey]?.CGRectValue else {
-                return nil
-        }
-
-        self.animationDuration = duration
-        // The kit uses a private animation curve that isn't represented in UIViewAnimationOptions
-        self.animationCurve = unsafeBitCast(curve, UIViewAnimationCurve.self)
-        self.endFrame = endFrame
-        if #available(iOS 9, *), let isLocal = userInfo[UIKeyboardIsLocalUserInfoKey] as? Bool {
+    init(userInfo: [NSObject: AnyObject]?) {
+        self.animationDuration = (userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? NSTimeInterval) ?? 0.25
+        self.animationCurve = .init(rawValue: ((userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt) ?? 7) << 16)
+        self.endFrame = userInfo?[UIKeyboardFrameEndUserInfoKey]?.CGRectValue
+        if #available(iOS 9, *), let isLocal = userInfo?[UIKeyboardIsLocalUserInfoKey] as? Bool {
             self.isLocal = isLocal
         } else {
             self.isLocal = true
         }
-        self.forDismissing = (userInfo[KeyboardUserInfoIsDismissingKey] as? Bool) ?? false
+    }
+
+    func animate(animations: () -> Void) {
+        // When performing a keyboard update around a screen rotation animation,
+        // UIKit disables animations and sends a duration of 0.
+        //
+        // For the keyboard, we're just going to assume a layout pass happens
+        // soon. (And maybe pray. Just a little.)
+        guard UIView.areAnimationsEnabled() && !animationDuration.isZero else { return }
+
+        UIView.animateWithDuration(animationDuration, delay: 0, options: [ animationCurve, .AllowUserInteraction, .BeginFromCurrentState ], animations: animations, completion: nil)
     }
 
     // A poor man's -[UIPeripheralHost getVerticalOverlapForView:usingKeyboardInfo:]
-    func overlap(in view: UIView) -> CGFloat? {
-        guard !forDismissing && !view.isEffectivelyInPopover, let target = view.superview else { return nil }
+    func overlap(in view: UIView) -> CGFloat {
+        guard !view.isEffectivelyInPopover, let endFrame = endFrame, target = view.superview else { return 0 }
         let localMinY = target.convertPoint(endFrame.origin, fromView: nil).y
-        return view.frame.maxY - localMinY
+        return max(view.frame.maxY - localMinY, 0)
     }
     
 }
