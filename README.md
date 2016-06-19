@@ -16,6 +16,13 @@ If you're hurting for Objective-C's `MyClassType<SomeProtocolType> *`, try this 
 
 Use [TextKit](https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/CustomTextProcessing/CustomTextProcessing.html) to perform custom truncation with high performance. Also an example of creating building a drop-in `UILabel` backed by TextKit.
 
+### Debounce
+
+* [Swift 2](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/Debounce.playground)
+* [Swift 3](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/Debounce.playground)
+
+Use [`DispatchSource`](https://developer.apple.com/reference/dispatch/dispatchsource) to coalesce calls that shouldn't be called more than once per runloop iteration, like UI reconfiguration.
+
 ### [Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/Geometry.playground)
 
 Mathematical operators and idiomatic bridging for Core Graphics types.
