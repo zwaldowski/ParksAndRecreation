@@ -80,6 +80,10 @@ A simple glueing together of `Swift.Dictionary` and `Swift.String` into an order
 
 "Size classes are fine, but I can't customize them!" Yeah, you can! By inspecting what Mobile Safari does, you can do the same, using override trait collections.
 
+### [Custom Readable Width](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ReadableWidth.playground)
+
+Emulating the calculation of [`UIView.readableContentGuide`](https://developer.apple.com/reference/uikit/uiview/1622644-readablecontentguide).
+
 ### [Regular Expressions](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/RegularExpression.playground)
 
 Simple Swift bridging for [`NSRegularExpression`](https://developer.apple.com/library/mac/documentation/Foundation/Reference/NSRegularExpression_Class/), as well as general patterns to go from `String.UTF16View` and `Range<String.UTF16Index>` to `NSString` and `NSRange`.
