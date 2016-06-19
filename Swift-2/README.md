@@ -89,9 +89,12 @@ Simple Swift bridging for [`NSRegularExpression`](https://developer.apple.com/li
 Conveniences for using Core Graphics types in UI programming, such as retina-friendly
 rounding and equation operators that account for floating point inaccuracy.
 
-### [Value Codable](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ValueCodable.playground)
+### Value Coding
 
-A simple bridge (intended for just Swift 2.x) to bridges concrete value types into `NSCoding`.
+* [Swift 2](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ValueCodable.playground)
+* [Swift 3](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/ValueCodable.playground)
+
+A simple bridge to bridges concrete value types into `NSCoding`.
 
 ### [View Recursion](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ViewRecursion.playground)
 
