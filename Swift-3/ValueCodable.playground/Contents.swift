@@ -85,7 +85,7 @@ extension UnicodeScalar: ValueCodable {
     }
 
     public init?(coder aDecoder: NSCoder) {
-        guard let scalar = aDecoder.decode(valueOf: String.self)?.unicodeScalars.first else { return nil }
+        guard let scalar = aDecoder.decodeValue(of: String.self)?.unicodeScalars.first else { return nil }
         self = scalar
     }
 
@@ -130,10 +130,10 @@ extension Person: ValueCodable, Equatable {
     }
 
     init?(coder aDecoder: NSCoder) {
-        guard let fullName = aDecoder.decode(valueOf: String.self, forKey: Keys.FullName.rawValue),
-            favoriteColor = aDecoder.decode(valueOf: ColorChoice.self, forKey: Keys.FavoriteColor.rawValue),
-            weightClass = aDecoder.decode(valueOf: WeightClass.self, forKey: Keys.WeightClass.rawValue),
-            zodiacSign = aDecoder.decode(valueOf: Zodiac.self, forKey: Keys.ZodiacSign.rawValue) else { return nil }
+        guard let fullName = aDecoder.decodeValue(of: String.self, forKey: Keys.FullName.rawValue),
+            favoriteColor = aDecoder.decodeValue(of: ColorChoice.self, forKey: Keys.FavoriteColor.rawValue),
+            weightClass = aDecoder.decodeValue(of: WeightClass.self, forKey: Keys.WeightClass.rawValue),
+            zodiacSign = aDecoder.decodeValue(of: Zodiac.self, forKey: Keys.ZodiacSign.rawValue) else { return nil }
         self.fullName = fullName
         self.favoriteColor = favoriteColor
         self.weightClass = weightClass
@@ -154,10 +154,14 @@ let value1 = Person(fullName: "Zachary Waldowski", favoriteColor: .blue, weightC
 let value2 = Person(fullName: "Christian Keur", favoriteColor: .other(taupe), weightClass: .welter, zodiacSign: .virgo)
 
 let data1 = NSKeyedArchiver.archived(with: value1)
-let newValue1 = NSKeyedUnarchiver.unarchived(valueOf: Person.self, with: data1)!
+let newValue1 = NSKeyedUnarchiver.unarchivedValue(of: Person.self, with: data1)!
 print(newValue1)
 
 let data2 = NSKeyedArchiver.archived(with: value2)
-let newValue2 = NSKeyedUnarchiver.unarchived(valueOf: Person.self, with: data2)!
+let newValue2 = NSKeyedUnarchiver.unarchivedValue(of: Person.self, with: data2)!
 print(newValue2)
 
+let value3: IndexSet = [ 0, 1, 3, 42, 43, 99 ]
+let data3 = NSKeyedArchiver.archived(with: value3)
+let newValue3 = NSKeyedUnarchiver.unarchivedValue(of: IndexSet.self, with: data3)!
+print(newValue3)

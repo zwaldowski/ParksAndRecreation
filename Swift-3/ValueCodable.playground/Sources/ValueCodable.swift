@@ -73,12 +73,12 @@ private extension NSCoder {
 extension NSCoder {
 
     /// Decode a Swift type that was previously encoded with
-    /// `encodeValue(_:forKey:)`.
+    /// `encode(_:forKey:)`.
     @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
     @available(OSX, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
     @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
     @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public func decode<Value: ValueCodable>(valueOf _: Value.Type = Value.self, forKey key: String? = nil) -> Value? {
+    public func decodeValue<Value: ValueCodable>(of type: Value.Type = Value.self, forKey key: String? = nil) -> Value? {
         return byDecodingBox {
             if let key = key {
                 return $0.decodeObjectOfClass(CodingBox<Value>.self, forKey: key)
@@ -89,7 +89,7 @@ extension NSCoder {
     }
 
     /// Decode a Swift type at the root of a hierarchy that was previously
-    /// encoded with `encodeValue(_:forKey:)`.
+    /// encoded with `encode(_:forKey:)`.
     ///
     /// The top-level distinction is important, as `NSCoder` uses Objective-C
     /// exceptions internally to communicate failure; here they are translated
@@ -98,7 +98,7 @@ extension NSCoder {
     @available(OSX, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
     @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
     @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public func decodeTopLevel<Value: ValueCodable>(valueOf _: Value.Type = Value.self, forKey key: String? = nil) throws -> Value? {
+    public func decodeTopLevelValue<Value: ValueCodable>(of type: Value.Type = Value.self, forKey key: String? = nil) throws -> Value? {
         return try byDecodingBox {
             if let key = key {
                 return try $0.decodeTopLevelObjectOfClass(CodingBox<Value>.self, forKey: key)
@@ -132,10 +132,10 @@ extension NSKeyedUnarchiver {
     @available(OSX, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
     @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
     @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public class func unarchived<Value: ValueCodable>(valueOf type: Value.Type = Value.self, with data: Data) -> Value? {
+    public class func unarchivedValue<Value: ValueCodable>(of type: Value.Type = Value.self, with data: Data) -> Value? {
         let unarchiver = self.init(forReadingWith: data)
         defer { unarchiver.finishDecoding() }
-        return unarchiver.decode(forKey: NSKeyedArchiveRootObjectKey)
+        return unarchiver.decodeValue(forKey: NSKeyedArchiveRootObjectKey)
     }
 
     /// Decodes and returns the tree of values previously encoded into `data`.
@@ -143,10 +143,10 @@ extension NSKeyedUnarchiver {
     @available(OSX, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
     @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
     @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public class func unarchivedTopLevel<Value: ValueCodable>(valueOf type: Value.Type = Value.self, with data: Data) throws -> Value? {
+    public class func unarchivedTopLevelValue<Value: ValueCodable>(of type: Value.Type = Value.self, with data: Data) throws -> Value? {
         let unarchiver = self.init(forReadingWith: data)
         defer { unarchiver.finishDecoding() }
-        return try unarchiver.decodeTopLevel(forKey: NSKeyedArchiveRootObjectKey)
+        return try unarchiver.decodeTopLevelValue(forKey: NSKeyedArchiveRootObjectKey)
     }
 
     private func setType<Value: ValueCodable>(_: Value.Type, forTypeName name: String, force: Bool) {

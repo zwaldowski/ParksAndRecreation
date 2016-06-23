@@ -3,8 +3,8 @@ import Foundation
 extension NSCoder {
 
     /// Decode a Swift type that was previously encoded with
-    /// `encodeValue(_:forKey:)`.
-    public func decode<Value: _ObjectiveCBridgeable where Value._ObjectiveCType: NSCoding, Value._ObjectiveCType: NSObject>(valueOf _: Value.Type = Value.self, forKey key: String? = nil) -> Value? {
+    /// `encode(_:forKey:)`.
+    public func decodeValue<Value: _ObjectiveCBridgeable where Value._ObjectiveCType: NSCoding, Value._ObjectiveCType: NSObject>(of type: Value.Type = Value.self, forKey key: String? = nil) -> Value? {
         if let key = key {
             return decodeObjectOfClass(Value._ObjectiveCType.self, forKey: key) as? Value
         } else {
@@ -13,13 +13,13 @@ extension NSCoder {
     }
 
     /// Decode a Swift type at the root of a hierarchy that was previously
-    /// encoded with `encodeValue(_:forKey:)`.
+    /// encoded with `encode(_:forKey:)`.
     ///
     /// The top-level distinction is important, as `NSCoder` uses Objective-C
     /// exceptions internally to communicate failure; here they are translated
     /// into Swift error-handling.
     @available(OSX 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *)
-    public func decodeTopLevel<Value: _ObjectiveCBridgeable where Value._ObjectiveCType: NSCoding, Value._ObjectiveCType: NSObject>(valueOf _: Value.Type = Value.self, forKey key: String? = nil) throws -> Value? {
+    public func decodeTopLevelValue<Value: _ObjectiveCBridgeable where Value._ObjectiveCType: NSCoding, Value._ObjectiveCType: NSObject>(of type: Value.Type = Value.self, forKey key: String? = nil) throws -> Value? {
         if let key = key {
             return try decodeTopLevelObjectOfClass(Value._ObjectiveCType.self, forKey: key) as? Value
         } else {
@@ -42,13 +42,13 @@ extension NSCoder {
 extension NSKeyedUnarchiver {
 
     /// Decodes and returns the tree of values previously encoded into `data`.
-    public static func unarchived<Value: _ObjectiveCBridgeable where Value._ObjectiveCType: NSCoding, Value._ObjectiveCType: NSObject>(valueOf _: Value.Type = Value.self, with data: Data) -> Value? {
+    public static func unarchivedValue<Value: _ObjectiveCBridgeable where Value._ObjectiveCType: NSCoding, Value._ObjectiveCType: NSObject>(of type: Value.Type = Value.self, with data: Data) -> Value? {
         return unarchiveObject(with: data) as? Value
     }
 
     /// Decodes and returns the tree of values previously encoded into `data`.
     @available(OSX 10.11, iOS 9.0, watchOS 2.0, tvOS 9.0, *)
-    public class func unarchivedTopLevel<Value: _ObjectiveCBridgeable where Value._ObjectiveCType: NSCoding, Value._ObjectiveCType: NSObject>(valueOf _: Value.Type = Value.self, with data: Data) throws -> Value? {
+    public class func unarchivedTopLevelValue<Value: _ObjectiveCBridgeable where Value._ObjectiveCType: NSCoding, Value._ObjectiveCType: NSObject>(of type: Value.Type = Value.self, with data: Data) throws -> Value? {
         return try unarchiveTopLevelObjectWithData(data as NSData) as? Value
     }
 }
@@ -68,5 +68,5 @@ extension NSKeyedArchiver {
 
         return data as Data
     }
-
+    
 }

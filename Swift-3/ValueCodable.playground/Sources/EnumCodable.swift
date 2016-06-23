@@ -9,7 +9,7 @@ extension RawRepresentable where RawValue: ValueCodable {
 
     /// Creates an instance from from data in a given unarchiver.
     public init?(coder: NSCoder) {
-        guard let raw = coder.decode(valueOf: RawValue.self) else { return nil }
+        guard let raw = coder.decodeValue(of: RawValue.self) else { return nil }
         self.init(rawValue: raw)
     }
 
@@ -24,7 +24,7 @@ extension RawRepresentable where RawValue: _ObjectiveCBridgeable, RawValue._Obje
 
     /// Creates an instance from from data in a given unarchiver.
     public init?(coder: NSCoder) {
-        guard let raw = coder.decode(valueOf: RawValue.self) else { return nil }
+        guard let raw = coder.decodeValue(of: RawValue.self) else { return nil }
         self.init(rawValue: raw)
     }
     
