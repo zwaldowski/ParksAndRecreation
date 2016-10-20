@@ -23,6 +23,10 @@ Use [TextKit](https://developer.apple.com/library/ios/documentation/StringsTextF
 
 Use [`DispatchSource`](https://developer.apple.com/reference/dispatch/dispatchsource) to coalesce calls that shouldn't be called more than once per runloop iteration, like UI reconfiguration.
 
+### [Delimited](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/Delimited.playground)
+
+A fast recursive-descent parser for CSVs and similarly structured data inspired by [Matt Gallagher](http://www.cocoawithlove.com/2009/11/writing-parser-using-nsscanner-csv.html).
+
 ### [Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/Geometry.playground)
 
 Mathematical operators and idiomatic bridging for Core Graphics types.
