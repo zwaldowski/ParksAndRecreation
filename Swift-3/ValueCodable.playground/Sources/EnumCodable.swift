@@ -19,7 +19,7 @@ extension RawRepresentable where RawValue: _ObjectiveCBridgeable, RawValue._Obje
 
     /// Encodes `self` using a given archiver.
     public func encode(with coder: NSCoder) {
-        coder.encode(rawValue)
+        coder.encode(rawValue as AnyObject)
     }
 
     /// Creates an instance from from data in a given unarchiver.
