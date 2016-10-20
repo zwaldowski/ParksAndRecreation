@@ -1,4 +1,4 @@
-import Dispatch
+import Foundation
 
 /// A set of flags describing a group of opterations that can be performed in a
 /// single invocation of a debounce.
@@ -10,7 +10,7 @@ import Dispatch
 /// - seealso: OptionSetType
 public protocol DebounceEvent: OptionSet {
     associatedtype RawValue: UnsignedInteger = UInt
-    static var Cancelled: Self { get }
+    static var cancelled: Self { get }
 }
 
 public final class MultiDebounce<Event: DebounceEvent, Context> {
@@ -23,18 +23,18 @@ public final class MultiDebounce<Event: DebounceEvent, Context> {
     // The handler will be called once-and-only-once per tick of the main
     // run loop by bitwise ORing all values sent to `schedule` between
     // invocations.
-    private let source = DispatchSource.userDataOr(queue: .main)
+    private let source = DispatchSource.makeUserDataOrSource(queue: .main)
 
     private var contextLock = pthread_mutex_t()
     private var _context: Context?
 
-    private init(validatingHandler: ValidatingHandler) {
+    private init(validatingHandler: @escaping ValidatingHandler) {
         self.handler = validatingHandler
         pthread_mutex_init(&contextLock, nil)
 
         source.setEventHandler {
             let event = Event(rawValue: numericCast(self.source.data))
-            guard event.intersection(.Cancelled) != .Cancelled else { return }
+            guard event.intersection(.cancelled) != .cancelled else { return }
             self.invokeHandler(for: event)
         }
 
@@ -50,7 +50,7 @@ public final class MultiDebounce<Event: DebounceEvent, Context> {
     ///
     /// - note: Anything captured strongly in the handler will be retained
     /// until `invalidate()` is called.
-    public convenience init(handler: Handler) {
+    public convenience init(handler: @escaping Handler) {
         self.init(validatingHandler: {
             handler($0, $1)
             return true
@@ -59,7 +59,7 @@ public final class MultiDebounce<Event: DebounceEvent, Context> {
 
     /// For debounces owned by an object and used to call instance methods on
     /// the object, use this constructor to capture the owner.
-    public convenience init<Owner: AnyObject>(owner: Owner, action: (Owner) -> Handler) {
+    public convenience init<Owner: AnyObject>(owner: Owner, action: @escaping(Owner) -> Handler) {
         self.init { [weak owner] (event, context) -> Bool in
             guard let owner = owner else { return false }
             action(owner)(event, context)
@@ -93,10 +93,28 @@ public final class MultiDebounce<Event: DebounceEvent, Context> {
     ///
     /// - parameter event: An event flag that will be combined with any running
     ///   flags.
+    /// - parameter immediately: If `true`, coalescing still occurs but the
+    ///   handler is synchronously executed.
     public func schedule(for event: Event, with context: Context) {
         self.context = context
 
-        source.mergeData(value: numericCast(event.rawValue))
+        source.or(data: numericCast(event.rawValue))
+    }
+
+    /// Synchronously execute a debounced call to the handler.
+    ///
+    /// Repeated calls that occur before the handler is called are cancelled,
+    /// replaced with the latest `context`.
+    public func scheduleImmediately(for event: Event, with context: Context) {
+        skipNext()
+
+        if Thread.isMainThread {
+            _ = handler(event, context)
+        } else {
+            DispatchQueue.main.sync {
+                _ = handler(event, context)
+            }
+        }
     }
 
     /// Cancels prior schedules and calls the handler for the `event` immediately.
@@ -112,7 +130,7 @@ public final class MultiDebounce<Event: DebounceEvent, Context> {
 
     /// Cancel the next scheduled handler call.
     public func skipNext() {
-        source.mergeData(value: numericCast(Event.Cancelled.rawValue))
+        source.or(data: numericCast(Event.cancelled.rawValue))
     }
 
     /// Unregister the debounce, releasing any captured context.
@@ -126,8 +144,8 @@ private struct UnitEvent: DebounceEvent {
     let rawValue: UInt
     init(rawValue: UInt) { self.rawValue = rawValue }
 
-    static let Scheduled = UnitEvent(rawValue: 1)
-    static let Cancelled = UnitEvent(rawValue: 2)
+    static let scheduled = UnitEvent(rawValue: 1)
+    static let cancelled = UnitEvent(rawValue: 2)
 }
 
 /// A "debounce" is a threading primitive for coalescing some event across
@@ -149,7 +167,7 @@ public struct Debounce<Context> {
     ///
     /// - note: Anything captured strongly in this handler will be retained
     /// until the invalidate() method is called.
-    public init(handler: Handler) {
+    public init(handler: @escaping Handler) {
         base = Base { (_, context) in
             handler(context)
         }
@@ -157,7 +175,7 @@ public struct Debounce<Context> {
 
     /// For debounces owned by an object and used to call instance methods on
     /// the object, use this constructor to capture the owner.
-    public init<Owner: AnyObject>(owner: Owner, action: (Owner) -> Handler) {
+    public init<Owner: AnyObject>(owner: Owner, action: @escaping(Owner) -> Handler) {
         base = Base(owner: owner, action: { owner in
             let fn = action(owner)
             return { fn($1) }
@@ -169,12 +187,20 @@ public struct Debounce<Context> {
     /// Repeated calls that occur before the handler is called are cancelled,
     /// replaced with the latest `context`.
     public func schedule(with context: Context) {
-        base.schedule(for: .Scheduled, with: context)
+        base.schedule(for: .scheduled, with: context)
+    }
+
+    /// Synchronously execute a debounced call to the handler.
+    ///
+    /// Repeated calls that occur before the handler is called are cancelled,
+    /// replaced with the latest `context`.
+    public func scheduleImmediately(with context: Context) {
+        base.scheduleImmediately(for: .scheduled, with: context)
     }
 
     /// Cancels prior schedules and calls the handler immediately.
     public func invoke(with context: Context) {
-        base.invoke(for: .Scheduled, with: context)
+        base.invoke(for: .scheduled, with: context)
     }
 
     /// Cancel the next scheduled handler call.

@@ -12,6 +12,6 @@ debounce.schedule(with: 3)
 debounce.schedule(with: 2)
 debounce.schedule(with: 1)
 
-DispatchQueue.main.after(when: .now() + 1.0) {
+DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
     PlaygroundPage.current.finishExecution()
 }
