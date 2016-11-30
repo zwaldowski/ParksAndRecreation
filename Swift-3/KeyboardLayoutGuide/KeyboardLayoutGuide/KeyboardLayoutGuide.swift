@@ -99,7 +99,7 @@ private final class KeyboardLayoutGuideSupport: NSObject {
 
         info.animate(animations: view.layoutIfNeeded)
 
-        owner.avoidFirstResponderInScrollView?.scrollFirstResponderToVisible(true)
+        owner.avoidFirstResponderInScrollView?.scrollFirstResponderToVisible(animated: true)
     }
 
     @objc func adjustForKeyboard(notificationUserInfo userInfo: [AnyHashable: Any]?) {

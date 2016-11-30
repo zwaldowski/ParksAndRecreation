@@ -38,7 +38,7 @@ extension UIScrollView {
         static let minimumVisiblePadding: CGFloat = 8
     }
 
-    func scrollFirstResponderToVisible(_ animated: Bool) {
+    func scrollFirstResponderToVisible(animated: Bool) {
         guard let firstResponder = findFirstResponder() else { return }
 
         let rect = convert(firstResponder.bounds, from: firstResponder).insetBy(dx: 0, dy: -Constants.minimumVisiblePadding)
@@ -49,28 +49,28 @@ extension UIScrollView {
 
 extension UITableView {
 
-    override func scrollFirstResponderToVisible(_ animated: Bool) {
+    override func scrollFirstResponderToVisible(animated: Bool) {
         for cell in visibleCells where cell.containsFirstResponder() {
             guard let indexPath = indexPath(for: cell) else { continue }
             scrollToRow(at: indexPath, at: .none, animated: animated)
             return
         }
 
-        super.scrollFirstResponderToVisible(animated)
+        super.scrollFirstResponderToVisible(animated: animated)
     }
 
 }
 
 extension UICollectionView {
 
-    override func scrollFirstResponderToVisible(_ animated: Bool) {
+    override func scrollFirstResponderToVisible(animated: Bool) {
         for cell in visibleCells where cell.containsFirstResponder() {
             guard let indexPath = indexPath(for: cell) else { continue }
             scrollToItem(at: indexPath, at: UICollectionViewScrollPosition(), animated: animated)
             return
         }
 
-        super.scrollFirstResponderToVisible(animated)
+        super.scrollFirstResponderToVisible(animated: animated)
     }
     
 }
