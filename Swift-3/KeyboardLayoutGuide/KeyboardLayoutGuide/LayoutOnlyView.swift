@@ -13,7 +13,7 @@ class LayoutOnlyView: UIView {
 
     // @c CATransformLayer is documented to never draw. This serves as a
     // performance optimization.
-    override class func layerClass() -> AnyClass {
+    override class var layerClass: AnyClass {
         return CATransformLayer.self
     }
 
@@ -29,7 +29,7 @@ class LayoutOnlyView: UIView {
     }
 
     // See @c backgroundColor
-    override var opaque: Bool {
+    override var isOpaque: Bool {
         get {
             return false
         }

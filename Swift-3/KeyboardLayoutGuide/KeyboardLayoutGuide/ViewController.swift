@@ -16,18 +16,18 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSLayoutConstraint.activateConstraints([
-            NSLayoutConstraint(item: redView, attribute: .Bottom, relatedBy: .Equal, toItem: keyboardLayoutGuide, attribute: .Bottom, multiplier: 1, constant: 0)
+        NSLayoutConstraint.activate([
+            NSLayoutConstraint(item: redView, attribute: .bottom, relatedBy: .equal, toItem: keyboardLayoutGuide, attribute: .bottom, multiplier: 1, constant: 0)
         ])
     }
 
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
         view.endEditing(true)
     }
 
-    @IBAction func dismissKeyboard(sender: UITapGestureRecognizer) {
+    @IBAction func dismissKeyboard(_ sender: UITapGestureRecognizer) {
         textField.resignFirstResponder()
     }
 

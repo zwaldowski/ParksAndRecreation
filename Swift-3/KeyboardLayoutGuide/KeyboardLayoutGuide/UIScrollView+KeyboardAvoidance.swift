@@ -11,7 +11,7 @@ import UIKit
 private extension UIView {
 
     @nonobjc func findFirstResponder() -> UIView? {
-        guard !isFirstResponder() else {
+        guard !isFirstResponder else {
             return self
         }
 
@@ -19,7 +19,7 @@ private extension UIView {
     }
 
     @nonobjc func containsFirstResponder() -> Bool {
-        guard !isFirstResponder() else {
+        guard !isFirstResponder else {
             return true
         }
 
@@ -34,15 +34,14 @@ private extension UIView {
 
 extension UIScrollView {
 
-    private struct Constants {
+    fileprivate struct Constants {
         static let minimumVisiblePadding: CGFloat = 8
     }
 
-    func scrollFirstResponderToVisible(animated animated: Bool) {
+    func scrollFirstResponderToVisible(_ animated: Bool) {
         guard let firstResponder = findFirstResponder() else { return }
 
-        var rect = convertRect(firstResponder.bounds, fromView: firstResponder)
-        rect.insetInPlace(dx: 0, dy: -Constants.minimumVisiblePadding)
+        let rect = convert(firstResponder.bounds, from: firstResponder).insetBy(dx: 0, dy: -Constants.minimumVisiblePadding)
         scrollRectToVisible(rect, animated: animated)
     }
 
@@ -50,28 +49,28 @@ extension UIScrollView {
 
 extension UITableView {
 
-    override func scrollFirstResponderToVisible(animated animated: Bool) {
+    override func scrollFirstResponderToVisible(_ animated: Bool) {
         for cell in visibleCells where cell.containsFirstResponder() {
-            guard let indexPath = indexPathForCell(cell) else { continue }
-            scrollToRowAtIndexPath(indexPath, atScrollPosition: .None, animated: animated)
+            guard let indexPath = indexPath(for: cell) else { continue }
+            scrollToRow(at: indexPath, at: .none, animated: animated)
             return
         }
 
-        super.scrollFirstResponderToVisible(animated: animated)
+        super.scrollFirstResponderToVisible(animated)
     }
 
 }
 
 extension UICollectionView {
 
-    override func scrollFirstResponderToVisible(animated animated: Bool) {
-        for cell in visibleCells() where cell.containsFirstResponder() {
-            guard let indexPath = indexPathForCell(cell) else { continue }
-            scrollToItemAtIndexPath(indexPath, atScrollPosition: .None, animated: animated)
+    override func scrollFirstResponderToVisible(_ animated: Bool) {
+        for cell in visibleCells where cell.containsFirstResponder() {
+            guard let indexPath = indexPath(for: cell) else { continue }
+            scrollToItem(at: indexPath, at: UICollectionViewScrollPosition(), animated: animated)
             return
         }
 
-        super.scrollFirstResponderToVisible(animated: animated)
+        super.scrollFirstResponderToVisible(animated)
     }
     
 }
