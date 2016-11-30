@@ -45,12 +45,6 @@ private final class KeyboardLayoutGuideSupport: NSObject {
         super.init()
     }
 
-    deinit {
-        if #available(iOS 9.0, *) {} else {
-            NotificationCenter.default.removeObserver(self)
-        }
-    }
-
     func activate() {
         activateConstraints()
 
@@ -163,44 +157,6 @@ private final class KeyboardLayoutGuideNative: UILayoutGuide, KeyboardLayoutGuid
     
 }
 
-// MARK: - Legacy Guide
-
-private final class KeyboardLayoutGuideLegacy: LayoutOnlyView, KeyboardLayoutGuidePrivate {
-
-    var support: KeyboardLayoutGuideSupport!
-    weak var avoidFirstResponderInScrollView: UIScrollView?
-
-    init(notificationCenter: NotificationCenter) {
-        super.init(frame: .zero)
-        commonInit(notificationCenter: notificationCenter)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        commonInit(notificationCenter: .default)
-    }
-
-    func commonInit(notificationCenter: NotificationCenter) {
-        isUserInteractionEnabled = false
-        translatesAutoresizingMaskIntoConstraints = false
-        support = KeyboardLayoutGuideSupport(owner: self, notificationCenter: notificationCenter)
-    }
-
-    override func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        support.activate()
-    }
-
-    var owningView: UIView? {
-        return superview
-    }
-    
-    @objc var length: CGFloat {
-        return bounds.height
-    }
-    
-}
-
 // MARK: - UIViewController
 
 private struct AssociatedObjects {
@@ -212,12 +168,6 @@ extension UIViewController {
     /// For unit testing purposes only.
     @nonobjc func makeKeyboardLayoutGuide(notificationCenter: NotificationCenter) -> KeyboardLayoutGuide {
         assert(isViewLoaded, "This layout guide should not be accessed before the view is loaded.")
-
-        guard #available(iOS 9.0, *) else {
-            let guide = KeyboardLayoutGuideLegacy(notificationCenter: notificationCenter)
-            view.addSubview(guide)
-            return guide
-        }
 
         let guide = KeyboardLayoutGuideNative(notificationCenter: notificationCenter)
         view.addLayoutGuide(guide)
@@ -296,7 +246,7 @@ private struct KeyboardInfo {
         self.animationCurve = .init(rawValue: ((userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt) ?? 7) << 16)
         
         self.endFrame = userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect
-        if #available(iOS 9, *), let isLocal = userInfo?[UIKeyboardIsLocalUserInfoKey] as? Bool {
+        if let isLocal = userInfo?[UIKeyboardIsLocalUserInfoKey] as? Bool {
             self.isLocal = isLocal
         } else {
             self.isLocal = true
