@@ -50,7 +50,7 @@ d.endIndex == d.count
 
 d["0"] == 1
 d[0] == ("0", 1)
-d[0 ... 1].elementsEqual([ ("0", 1), ("1", 7) ], by: ==)
+d[0 ..< 2].elementsEqual([ (key: "0", value: 1), (key: "1", value: 7) ], by: ==)
 
 // Remove all
 
