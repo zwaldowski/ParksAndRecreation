@@ -1,0 +1,311 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DB5400381CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB5400371CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift */; };
+		DBDA20321B89FFFC008DAC57 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDA20311B89FFFC008DAC57 /* AppDelegate.swift */; };
+		DBDA20341B89FFFC008DAC57 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDA20331B89FFFC008DAC57 /* ViewController.swift */; };
+		DBDA20371B89FFFC008DAC57 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DBDA20351B89FFFC008DAC57 /* Main.storyboard */; };
+		DBDA203C1B89FFFC008DAC57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DBDA203B1B89FFFC008DAC57 /* Assets.xcassets */; };
+		DBDA203F1B89FFFC008DAC57 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DBDA203D1B89FFFC008DAC57 /* LaunchScreen.storyboard */; };
+		DBDA20551B8A000A008DAC57 /* KeyboardLayoutGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBDA20541B8A000A008DAC57 /* KeyboardLayoutGuide.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		DB5400371CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIScrollView+KeyboardAvoidance.swift"; sourceTree = "<group>"; };
+		DBDA202E1B89FFFC008DAC57 /* KeyboardLayoutGuide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeyboardLayoutGuide.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DBDA20311B89FFFC008DAC57 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DBDA20331B89FFFC008DAC57 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		DBDA20361B89FFFC008DAC57 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		DBDA203B1B89FFFC008DAC57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DBDA203E1B89FFFC008DAC57 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		DBDA20401B89FFFC008DAC57 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DBDA20541B8A000A008DAC57 /* KeyboardLayoutGuide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardLayoutGuide.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DBDA202B1B89FFFC008DAC57 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DBDA20251B89FFFC008DAC57 = {
+			isa = PBXGroup;
+			children = (
+				DBDA20301B89FFFC008DAC57 /* KeyboardLayoutGuide */,
+				DBDA202F1B89FFFC008DAC57 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DBDA202F1B89FFFC008DAC57 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DBDA202E1B89FFFC008DAC57 /* KeyboardLayoutGuide.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DBDA20301B89FFFC008DAC57 /* KeyboardLayoutGuide */ = {
+			isa = PBXGroup;
+			children = (
+				DBDA20311B89FFFC008DAC57 /* AppDelegate.swift */,
+				DBDA20331B89FFFC008DAC57 /* ViewController.swift */,
+				DBDA20541B8A000A008DAC57 /* KeyboardLayoutGuide.swift */,
+				DB5400371CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift */,
+				DBDA203B1B89FFFC008DAC57 /* Assets.xcassets */,
+				DBDA203D1B89FFFC008DAC57 /* LaunchScreen.storyboard */,
+				DBDA20351B89FFFC008DAC57 /* Main.storyboard */,
+				DBDA20401B89FFFC008DAC57 /* Info.plist */,
+			);
+			path = KeyboardLayoutGuide;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DBDA202D1B89FFFC008DAC57 /* KeyboardLayoutGuide */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DBDA204E1B89FFFC008DAC57 /* Build configuration list for PBXNativeTarget "KeyboardLayoutGuide" */;
+			buildPhases = (
+				DBDA202A1B89FFFC008DAC57 /* Sources */,
+				DBDA202B1B89FFFC008DAC57 /* Frameworks */,
+				DBDA202C1B89FFFC008DAC57 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KeyboardLayoutGuide;
+			productName = KeyboardLayoutGuide;
+			productReference = DBDA202E1B89FFFC008DAC57 /* KeyboardLayoutGuide.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DBDA20261B89FFFC008DAC57 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0810;
+				ORGANIZATIONNAME = "Big Nerd Ranch";
+				TargetAttributes = {
+					DBDA202D1B89FFFC008DAC57 = {
+						CreatedOnToolsVersion = 7.0;
+						LastSwiftMigration = 0810;
+					};
+				};
+			};
+			buildConfigurationList = DBDA20291B89FFFC008DAC57 /* Build configuration list for PBXProject "KeyboardLayoutGuide" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DBDA20251B89FFFC008DAC57;
+			productRefGroup = DBDA202F1B89FFFC008DAC57 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DBDA202D1B89FFFC008DAC57 /* KeyboardLayoutGuide */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DBDA202C1B89FFFC008DAC57 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBDA203F1B89FFFC008DAC57 /* LaunchScreen.storyboard in Resources */,
+				DBDA203C1B89FFFC008DAC57 /* Assets.xcassets in Resources */,
+				DBDA20371B89FFFC008DAC57 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DBDA202A1B89FFFC008DAC57 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB5400381CD98219009A1B9D /* UIScrollView+KeyboardAvoidance.swift in Sources */,
+				DBDA20341B89FFFC008DAC57 /* ViewController.swift in Sources */,
+				DBDA20551B8A000A008DAC57 /* KeyboardLayoutGuide.swift in Sources */,
+				DBDA20321B89FFFC008DAC57 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		DBDA20351B89FFFC008DAC57 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DBDA20361B89FFFC008DAC57 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		DBDA203D1B89FFFC008DAC57 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DBDA203E1B89FFFC008DAC57 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		DBDA204C1B89FFFC008DAC57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DBDA204D1B89FFFC008DAC57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DBDA204F1B89FFFC008DAC57 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = KeyboardLayoutGuide/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.bignerdranch.KeyboardLayoutGuide;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		DBDA20501B89FFFC008DAC57 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = KeyboardLayoutGuide/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.bignerdranch.KeyboardLayoutGuide;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DBDA20291B89FFFC008DAC57 /* Build configuration list for PBXProject "KeyboardLayoutGuide" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBDA204C1B89FFFC008DAC57 /* Debug */,
+				DBDA204D1B89FFFC008DAC57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DBDA204E1B89FFFC008DAC57 /* Build configuration list for PBXNativeTarget "KeyboardLayoutGuide" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBDA204F1B89FFFC008DAC57 /* Debug */,
+				DBDA20501B89FFFC008DAC57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DBDA20261B89FFFC008DAC57 /* Project object */;
+}
