@@ -31,11 +31,14 @@ A fast recursive-descent parser for CSVs and similarly structured data inspired 
 
 Mathematical operators and idiomatic bridging for Core Graphics types.
 
-### [Keyboard Layout Guide](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/KeyboardLayoutGuide)
+### Keyboard Layout Guide
+
+* [Swift 2](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/KeyboardLayoutGuide)
+* [Swift 3](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/KeyboardLayoutGuide)
 
 An extension on `UIViewController` providing a `keyboardLayoutGuide` property. The layout guide normally mirrors the `topLayoutGuide` and `bottomLayoutGuide`, but automatically resizes to avoid the keyboard.
 
-Requires iOS 9.0.
+The Swift 3 version requires iOS 9.0.
 
 ### [String Tokenization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/LineParagraphs.playground)
 
