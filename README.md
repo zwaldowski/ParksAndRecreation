@@ -27,6 +27,10 @@ Use [`DispatchSource`](https://developer.apple.com/reference/dispatch/dispatchso
 
 A fast recursive-descent parser for CSVs and similarly structured data inspired by [Matt Gallagher](http://www.cocoawithlove.com/2009/11/writing-parser-using-nsscanner-csv.html).
 
+### [Deriving Scroll Views](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/DerivingScrollViews.playground)
+
+Based on a technique used in the iOS 10 Music app, subclasses of `UICollectionView` and `UITableView` that derive their intrinsic content size and visible bounds from their content and context, respectively, when `isScrollEnabled = false`. This is similar to behavior on `UITextView`. It enables, for instance, putting three collection views in a stack view in a scroll view with low performance impact, with zero performance impact.
+
 ### [Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/Geometry.playground)
 
 Mathematical operators and idiomatic bridging for Core Graphics types.
