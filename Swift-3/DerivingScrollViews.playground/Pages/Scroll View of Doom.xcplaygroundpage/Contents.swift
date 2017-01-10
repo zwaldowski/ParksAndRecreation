@@ -17,10 +17,22 @@ class ExampleViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            view.rightAnchor.constraint(equalTo: scrollView.rightAnchor)
+            view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor)
         ])
+
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Scroll", style: .plain, target: self, action: #selector(magicScroll))
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        print(scrollView.contentSize)
+    }
+
+    @objc private func magicScroll(from sender: Any) {
+        scrollView.scrollRectToVisible(CGRect(x: 0, y: 2000, width: 200, height: 10), animated: true)
     }
     
 }
@@ -43,9 +55,9 @@ class ExampleTableViewController: ExampleViewController, UITableViewDataSource {
             
             NSLayoutConstraint.activate([
                 v.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-                v.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10),
+                v.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
                 contentView.bottomAnchor.constraint(equalTo: v.bottomAnchor, constant: 10),
-                contentView.rightAnchor.constraint(equalTo: v.rightAnchor, constant: 10)
+                contentView.trailingAnchor.constraint(equalTo: v.trailingAnchor, constant: 10)
             ])
         }
         
@@ -114,9 +126,9 @@ class ExampleCollectionViewController: ExampleViewController, UICollectionViewDa
             
             NSLayoutConstraint.activate([
                 v.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-                v.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 10),
+                v.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
                 contentView.bottomAnchor.constraint(equalTo: v.bottomAnchor, constant: 10),
-                contentView.rightAnchor.constraint(equalTo: v.rightAnchor, constant: 10)
+                contentView.trailingAnchor.constraint(equalTo: v.trailingAnchor, constant: 10)
             ])
         }
         

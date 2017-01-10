@@ -20,8 +20,7 @@ class StackedCollectionViewsController: UIViewController, UICollectionViewDataSo
         }
         
     }
-    
-    
+
     class GreenCell: RedCell {
         
         override class var color: UIColor { return .green }
@@ -90,19 +89,26 @@ class StackedCollectionViewsController: UIViewController, UICollectionViewDataSo
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            view.rightAnchor.constraint(equalTo: scrollView.rightAnchor),
+            view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             
             stackView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-            stackView.leftAnchor.constraint(equalTo: scrollView.leftAnchor, constant: 10),
+            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 10),
+            scrollView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: 10),
             stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 10),
             scrollView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 10)
         ])
     }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        print(scrollView.contentSize)
+    }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 80
+        return 85
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
