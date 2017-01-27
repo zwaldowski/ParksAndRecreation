@@ -7,18 +7,40 @@
 //
 
 import UIKit
-import ObjectiveC
 
 /// A keyboard layout guide may be used as an item in Auto Layout, for its
 /// layout anchors, or may be queried for its length property.
-public final class KeyboardLayoutGuide: UILayoutGuide {
-    
-    // MARK: - Properties
-    
+public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
+
+    // MARK: Lifecycle
+
     private let notificationCenter: NotificationCenter
-    private var registeredForNotifications = false
-    private var bottomToContainerConstraint: NSLayoutConstraint?
-    
+
+    private func commonInit() {
+        identifier = "KeyboardLayoutGuide"
+        notificationCenter.addObserver(self, selector: #selector(noteKeyboardShow), name: .UIKeyboardWillShow, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(noteKeyboardHide), name: .UIKeyboardWillHide, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(noteKeyboardShow), name: .UIKeyboardDidChangeFrame, object: nil)
+    }
+
+    public override convenience init() {
+        self.init(notificationCenter: .default)
+    }
+
+    public required init?(coder aDecoder: NSCoder) {
+        self.notificationCenter = .default
+        super.init(coder: aDecoder)
+        commonInit()
+    }
+
+    init(notificationCenter: NotificationCenter) {
+        self.notificationCenter = notificationCenter
+        super.init()
+        commonInit()
+    }
+
+    // MARK: Public API
+
     /// If assigned, and this scroll view contains the first responder, it will
     /// be scrolled into view upon any keyboard change.
     ///
@@ -27,101 +49,72 @@ public final class KeyboardLayoutGuide: UILayoutGuide {
     /// `UICollectionViewController`.
     public weak var avoidFirstResponderInScrollView: UIScrollView?
 
-    // MARK: - Lifecycle
+    // MARK: UILayoutGuide
 
-    private func commonInit() {
-        identifier = "KeyboardLayoutGuide"
-        notificationCenter.addObserver(self, selector: #selector(noteKeyboardWillShow), name: .UIKeyboardWillShow, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(noteKeyboardWillHide), name: .UIKeyboardWillHide, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(noteKeyboardDidChangeFrame), name: NSNotification.Name.UIKeyboardDidChangeFrame, object: nil)
-    }
-
-    init(notificationCenter: NotificationCenter) {
-        self.notificationCenter = notificationCenter
-        super.init()
-        commonInit()
-    }
-    
-    required public init?(coder aDecoder: NSCoder) {
-        self.notificationCenter = .default
-        super.init(coder: aDecoder)
-        commonInit()
-    }
-    
-    // MARK: - UILayoutGuide
-    
+    /// The view that owns this layout guide.
     override public weak var owningView: UIView? {
         didSet {
             activateConstraints()
         }
     }
-    
-    // MARK: - Actions
+
+    // MARK: UILayoutSupport
+
+    /// Provides the length, in points, of the portion of a view controller’s
+    /// view that is visible outside of translucent or transparent UIKit bars
+    /// and the keyboard.
+    public var length: CGFloat {
+        return layoutFrame.height
+    }
+
+    // MARK: Actions
+
+    private var keyboardBottomConstraint: NSLayoutConstraint?
 
     private func activateConstraints() {
         guard let view = owningView else {
-            bottomToContainerConstraint = nil
+            keyboardBottomConstraint = nil
             return
         }
 
-        let vcTopAnchor: NSLayoutYAxisAnchor
-        let vcBottomAnchor: NSLayoutYAxisAnchor
-        if let vc = view.findNextViewController() {
-            vcTopAnchor = vc.topLayoutGuide.bottomAnchor
-            vcBottomAnchor = vc.bottomLayoutGuide.topAnchor
-        } else {
-            vcTopAnchor = view.topAnchor
-            vcBottomAnchor = view.bottomAnchor
-        }
-
-        let bottomToContainer = view.bottomAnchor.constraint(equalTo: bottomAnchor)
-        self.bottomToContainerConstraint = bottomToContainer
-
         NSLayoutConstraint.activate([
-            bottomToContainer,
-            topAnchor.constraint(equalTo: vcTopAnchor), {
-                let constraint = vcBottomAnchor.constraint(equalTo: bottomAnchor)
+            leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            view.layoutMarginsGuide.trailingAnchor.constraint(equalTo: trailingAnchor), {
+                let constraint = topAnchor.constraint(equalTo: view.topAnchor)
                 constraint.priority = UILayoutPriorityDefaultLow
                 return constraint
             }(), {
-                let constraint = vcBottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor)
-                constraint.priority = 999
+                let constraint = view.bottomAnchor.constraint(equalTo: bottomAnchor)
+                constraint.priority = 998
+                self.keyboardBottomConstraint = constraint
                 return constraint
-            }(),
-            leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            view.layoutMarginsGuide.trailingAnchor.constraint(equalTo: trailingAnchor)
+            }()
         ])
     }
-    
-    @objc private func updateKeyboard(forInfo info: Any?) {
-        guard let info = info as? KeyboardInfo, info.isLocal,
-            let view = owningView, !view.isEffectivelyDisappearing else { return }
-        
-        let constant = info.overlap(in: view)
-        guard constant != bottomToContainerConstraint?.constant else { return }
-        bottomToContainerConstraint?.constant = constant
-        
-        info.animate(animations: view.layoutIfNeeded)
-        
+
+    @objc private func updateKeyboard(forUserInfo userInfo: [AnyHashable: Any]?) {
+        let info = KeyboardInfo(userInfo: userInfo)
+        guard info.isLocal else { return }
+
         avoidFirstResponderInScrollView?.scrollFirstResponderToVisible(animated: true)
+
+        guard let view = owningView, !view.isEffectivelyDisappearing else { return }
+        keyboardBottomConstraint?.constant = info.overlap(in: view)
+        
+        info.animate(by: view.layoutIfNeeded)
     }
     
     // MARK: - Notifications
 
-    @objc private func noteKeyboardWillShow(note: NSNotification) {
-        updateKeyboard(forInfo: KeyboardInfo(userInfo: note.userInfo))
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(updateKeyboard(forInfo:)), object: nil)
+    @objc private func noteKeyboardShow(note: Notification) {
+        type(of: self).cancelPreviousPerformRequests(withTarget: self, selector: #selector(updateKeyboard), object: nil)
+        updateKeyboard(forUserInfo: note.userInfo)
     }
 
-    @objc private func noteKeyboardWillHide(note: NSNotification) {
-        perform(#selector(updateKeyboard(forInfo:)), with: KeyboardInfo(userInfo: nil), afterDelay: 0)
+    @objc private func noteKeyboardHide(note: Notification) {
+        perform(#selector(updateKeyboard), with: nil, afterDelay: 0, inModes: [ .commonModes ])
     }
 
-    @objc private func noteKeyboardDidChangeFrame(note: NSNotification) {
-        updateKeyboard(forInfo: KeyboardInfo(userInfo: note.userInfo))
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(updateKeyboard(forInfo:)), object: nil)
-    }
-    
 }
 
 // MARK: - UIViewController
@@ -136,6 +129,12 @@ extension UIViewController {
 
         let guide = KeyboardLayoutGuide(notificationCenter: notificationCenter)
         view.addLayoutGuide(guide)
+
+        NSLayoutConstraint.activate([
+            guide.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
+            bottomLayoutGuide.topAnchor.constraint(greaterThanOrEqualTo: guide.bottomAnchor)
+        ])
+
         return guide
     }
 
@@ -144,11 +143,11 @@ extension UIViewController {
     /// simplified model for performing layout by avoiding the keyboard.
     ///
     /// Normally, the guide is a rectangle matching the top and bottom
-    /// guides of a recieving view controller and the leading and trailing
+    /// guides of a receiving view controller and the leading and trailing
     /// margins of its view. When the keyboard is active.
     ///
     /// - seealso: KeyboardLayoutGuide
-    public var keyboardLayoutGuide: KeyboardLayoutGuide {
+    @nonobjc public var keyboardLayoutGuide: KeyboardLayoutGuide {
         if let guide = objc_getAssociatedObject(self, &UIViewController.keyboardLayoutGuideKey) as? KeyboardLayoutGuide {
             return guide
         }
@@ -196,31 +195,30 @@ private struct KeyboardInfo {
 
     let animationDuration: TimeInterval
     let animationCurve: UIViewAnimationOptions
-    let endFrame: CGRect?
+    let endFrame: CGRect
     let isLocal: Bool
 
     init(userInfo: [AnyHashable: Any]?) {
         self.animationDuration = (userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval) ?? 0.25
         self.animationCurve = UIViewAnimationOptions(rawValue: ((userInfo?[UIKeyboardAnimationCurveUserInfoKey] as? UInt) ?? 7) << 16)
-        self.endFrame = userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect
+        self.endFrame = userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect ?? .zero
         self.isLocal = (userInfo?[UIKeyboardIsLocalUserInfoKey] as? Bool) ?? true
     }
 
-    func animate(animations: @escaping () -> Void) {
+    func animate(by animations: @escaping() -> Void) {
         // When performing a keyboard update around a screen rotation animation,
         // UIKit disables animations and sends a duration of 0.
         //
         // For the keyboard, we're just going to assume a layout pass happens
         // soon. (And maybe pray. Just a little.)
         guard UIView.areAnimationsEnabled && !animationDuration.isZero else { return }
-
-        UIView.animate(withDuration: animationDuration, delay: 0, options: [ animationCurve, .allowUserInteraction, .beginFromCurrentState ], animations: animations, completion: nil)
+        UIView.animate(withDuration: animationDuration, delay: 0, options: [ animationCurve, .beginFromCurrentState ], animations: animations)
     }
 
-    // A poor man's -[UIPeripheralHost getVerticalOverlapForView:usingKeyboardInfo:]
+    // Modeled after -[UIPeripheralHost getVerticalOverlapForView:usingKeyboardInfo:]
     func overlap(in view: UIView) -> CGFloat {
-        guard !view.isEffectivelyInPopover, let endFrame = endFrame, let target = view.superview else { return 0 }
-        let localMinY = target.convert(endFrame.origin, from: nil).y
+        guard !view.isEffectivelyInPopover, !endFrame.isEmpty, let target = view.superview else { return 0 }
+        let localMinY = target.convert(endFrame, from: UIScreen.main.coordinateSpace).minY
         return max(view.frame.maxY - localMinY, 0)
     }
     
