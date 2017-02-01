@@ -8,6 +8,12 @@
 
 import UIKit
 
+private extension Notification.Name {
+
+    static let KeyboardLayoutGuideDidUpdate = Notification.Name(rawValue: "KeyboardLayoutGuideDidUpdateNotification")
+
+}
+
 /// A keyboard layout guide may be used as an item in Auto Layout, for its
 /// layout anchors, or may be queried for its length property.
 public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
@@ -17,10 +23,10 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
     private let notificationCenter: NotificationCenter
 
     private func commonInit() {
-        identifier = "KeyboardLayoutGuide"
         notificationCenter.addObserver(self, selector: #selector(noteKeyboardShow), name: .UIKeyboardWillShow, object: nil)
         notificationCenter.addObserver(self, selector: #selector(noteKeyboardHide), name: .UIKeyboardWillHide, object: nil)
         notificationCenter.addObserver(self, selector: #selector(noteKeyboardShow), name: .UIKeyboardDidChangeFrame, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(noteAncestorGuideUpdate), name: .KeyboardLayoutGuideDidUpdate, object: nil)
     }
 
     public override convenience init() {
@@ -96,12 +102,16 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
         let info = KeyboardInfo(userInfo: userInfo)
         guard info.isLocal else { return }
 
-        avoidFirstResponderInScrollView?.scrollFirstResponderToVisible(animated: true)
-
         guard let view = owningView, !view.isEffectivelyDisappearing else { return }
         keyboardBottomConstraint?.constant = info.overlap(in: view)
-        
-        info.animate(by: view.layoutIfNeeded)
+
+        info.animate {
+            self.avoidFirstResponderInScrollView?.scrollFirstResponderToVisible(animated: true)
+
+            view.layoutIfNeeded()
+
+            NotificationCenter.default.post(name: .KeyboardLayoutGuideDidUpdate, object: view, userInfo: userInfo)
+        }
     }
     
     // MARK: - Notifications
@@ -113,6 +123,13 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
 
     @objc private func noteKeyboardHide(note: Notification) {
         perform(#selector(updateKeyboard), with: nil, afterDelay: 0, inModes: [ .commonModes ])
+    }
+
+    @objc private func noteAncestorGuideUpdate(note: Notification) {
+        guard let view = owningView, let ancestorView = note.object as? UIView,
+            view !== ancestorView, view.isDescendant(of: ancestorView) else { return }
+
+        keyboardBottomConstraint?.constant = KeyboardInfo(userInfo: note.userInfo).overlap(in: view)
     }
 
 }
@@ -184,7 +201,6 @@ private extension UIView {
     }
 
     var isEffectivelyDisappearing: Bool {
-        guard window != nil else { return true }
         guard let vc = findNextViewController() else { return false }
         return vc.isBeingDismissed || vc.isMovingFromParentViewController
     }
