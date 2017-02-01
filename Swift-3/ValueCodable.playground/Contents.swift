@@ -111,7 +111,7 @@ enum Zodiac: UnicodeScalar, ValueCodable {
 /// Custom struct conforming to ValueCodable.
 struct Person {
     let fullName: String
-    let favoriteColor: ColorChoice
+    let favoriteColor: ColorChoice?
     let weightClass: WeightClass
     let zodiacSign: Zodiac
 }
@@ -131,11 +131,10 @@ extension Person: ValueCodable, Equatable {
 
     init?(coder aDecoder: NSCoder) {
         guard let fullName = aDecoder.decodeValue(of: String.self, forKey: Keys.FullName.rawValue),
-            let favoriteColor = aDecoder.decodeValue(of: ColorChoice.self, forKey: Keys.FavoriteColor.rawValue),
             let weightClass = aDecoder.decodeValue(of: WeightClass.self, forKey: Keys.WeightClass.rawValue),
             let zodiacSign = aDecoder.decodeValue(of: Zodiac.self, forKey: Keys.ZodiacSign.rawValue) else { return nil }
         self.fullName = fullName
-        self.favoriteColor = favoriteColor
+        self.favoriteColor = aDecoder.decodeValue(of: ColorChoice.self, forKey: Keys.FavoriteColor.rawValue)
         self.weightClass = weightClass
         self.zodiacSign = zodiacSign
     }

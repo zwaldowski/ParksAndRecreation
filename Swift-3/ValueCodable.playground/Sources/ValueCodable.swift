@@ -18,73 +18,102 @@ public protocol ValueCodable {
     init?(coder aDecoder: NSCoder)
 }
 
-private final class CodingBox<Value: ValueCodable>: NSObject, NSCoding {
+private final class EncodingBox: NSObject, NSCoding {
 
-    init(_ value: Value) {
+    let value: ValueCodable
+    
+    init(_ value: ValueCodable) {
         self.value = value
         super.init()
     }
-
-    let value: Value!
-
-    @objc func encode(with aCoder: NSCoder) {
-        value.encode(with: aCoder)
+    
+    init?(coder aDecoder: NSCoder) {
+        fatalError()
     }
 
-    @objc init?(coder aDecoder: NSCoder) {
-        guard let value = Value(coder: aDecoder) else {
-            self.value = nil
-            super.init()
-            return nil
+    func encode(with aCoder: NSCoder) {
+        guard aCoder.allowsKeyedCoding, let archiver = aCoder as? NSKeyedArchiver else {
+            preconditionFailure()
         }
+        let className = aCoder.markerClassName(for: type(of: value))
+        archiver.setClassName(className, for: type(of: self))
+        value.encode(with: archiver)
+        archiver.setClassName(className, for: type(of: self))
+    }
+
+}
+
+private final class DecodingBox<Value: ValueCodable>: NSObject, NSCoding {
+    
+    let value: Value
+    
+    init?(coder aDecoder: NSCoder) {
+        guard let value = Value(coder: aDecoder) else { return nil }
         self.value = value
         super.init()
+    }
+
+    func encode(with aCoder: NSCoder) {
+        fatalError()
     }
 
 }
 
 private extension NSCoder {
-
-    func boxedClassNameFor(_ name: String) -> String {
+    
+    func markerClassName(for type: ValueCodable.Type) -> String {
+        return markerClassName(forName: String(describing: type))
+    }
+    
+    func markerClassName(forName name: String) -> String {
         return "Encoded<\(name)>"
     }
 
-    func byDecodingBox<Value: ValueCodable>(_ body: (NSKeyedUnarchiver) throws -> CodingBox<Value>?) rethrows -> Value? {
-        assert(allowsKeyedCoding)
+}
 
+@available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
+@available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
+@available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
+@available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
+extension NSCoder {
+
+    private func valueByDecodingBox<Value: ValueCodable>(_ body: (NSKeyedUnarchiver) throws -> DecodingBox<Value>?) rethrows -> Value? {
+        assert(allowsKeyedCoding)
         guard let archiver = self as? NSKeyedUnarchiver else { return nil }
-        archiver.setBoxType(Value.self, forTypeName: String(describing: Value.self), force: false)
+        
+        let className = markerClassName(for: Value.self)
+        if archiver.class(forClassName: className) == nil {
+            archiver.setClass(DecodingBox<Value>.self, forClassName: className)
+        }
 
         guard let boxed = try body(archiver) else { return nil }
         return boxed.value
     }
 
-    func encodeBox<Value: ValueCodable>(withValue getValue: @autoclosure() -> Value, body: (NSKeyedArchiver, CodingBox<Value>) throws -> Void) rethrows {
-        assert(allowsKeyedCoding)
-
-        guard let archiver = self as? NSKeyedArchiver else { return }
-        archiver.setName(String(describing: Value.self), forBoxedType: Value.self)
-
-        return try body(archiver, .init(getValue()))
+    /// Decode a Swift type that was previously encoded with `encode(_:)`.
+    public func decodeValue<Value: ValueCodable>(of type: Value.Type = Value.self) -> Value? {
+        return valueByDecodingBox {
+            $0.decodeObject() as? DecodingBox<Value>
+        }
     }
-
-}
-
-extension NSCoder {
 
     /// Decode a Swift type that was previously encoded with
     /// `encode(_:forKey:)`.
-    @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
-    @available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
-    @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
-    @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public func decodeValue<Value: ValueCodable>(of type: Value.Type = Value.self, forKey key: String? = nil) -> Value? {
-        return byDecodingBox {
-            if let key = key {
-                return $0.decodeObject(of: CodingBox<Value>.self, forKey: key)
-            } else {
-                return $0.decodeObject() as? CodingBox<Value>
-            }
+    public func decodeValue<Value: ValueCodable>(of type: Value.Type = Value.self, forKey key: String) -> Value? {
+        return valueByDecodingBox {
+            $0.decodeObject(of: DecodingBox<Value>.self, forKey: key)
+        }
+    }
+
+    /// Decode a Swift type at the root of a hierarchy that was previously
+    /// encoded with `encode(_:)`.
+    ///
+    /// The top-level distinction is important, as `NSCoder` uses Objective-C
+    /// exceptions internally to communicate failure; here they are translated
+    /// into Swift error-handling.
+    public func decodeTopLevelValue<Value: ValueCodable>(of type: Value.Type = Value.self) throws -> Value? {
+        return try valueByDecodingBox {
+            try $0.decodeTopLevelObject() as? DecodingBox<Value>
         }
     }
 
@@ -94,51 +123,31 @@ extension NSCoder {
     /// The top-level distinction is important, as `NSCoder` uses Objective-C
     /// exceptions internally to communicate failure; here they are translated
     /// into Swift error-handling.
-    @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
-    @available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
-    @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
-    @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public func decodeTopLevelValue<Value: ValueCodable>(of type: Value.Type = Value.self, forKey key: String? = nil) throws -> Value? {
-        return try byDecodingBox {
-            if let key = key {
-                return try $0.decodeTopLevelObject(of: CodingBox<Value>.self, forKey: key)
-            } else {
-                return try $0.decodeTopLevelObject() as? CodingBox<Value>
-            }
+    public func decodeTopLevelValue<Value: ValueCodable>(of type: Value.Type = Value.self, forKey key: String) throws -> Value? {
+        return try valueByDecodingBox {
+            try $0.decodeTopLevelObject(of: DecodingBox<Value>.self, forKey: key)
         }
     }
 
     /// Encodes a `value` and associates it with a given `key`.
-    @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
-    @available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
-    @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
-    @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public func encode<Value: ValueCodable>(_ value: Value) {
-        encodeBox(withValue: value) {
-            $0.encode($1)
-        }
+    public func encode(_ value: ValueCodable?) {
+        encode(value.map(EncodingBox.init))
     }
 
     /// Encodes a `value` and associates it with a given `key`.
-    @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
-    @available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
-    @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
-    @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public func encode<Value: ValueCodable>(_ value: Value, forKey key: String) {
-        encodeBox(withValue: value) {
-            $0.encode($1, forKey: key)
-        }
+    public func encode(_ value: ValueCodable?, forKey key: String) {
+        encode(value.map(EncodingBox.init), forKey: key)
     }
 
 }
 
+@available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
+@available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
+@available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
+@available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
 extension NSKeyedUnarchiver {
 
     /// Decodes and returns the tree of values previously encoded into `data`.
-    @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
-    @available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
-    @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
-    @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
     public class func unarchivedValue<Value: ValueCodable>(of type: Value.Type = Value.self, with data: Data) -> Value? {
         let unarchiver = self.init(forReadingWith: data)
         defer { unarchiver.finishDecoding() }
@@ -146,43 +155,29 @@ extension NSKeyedUnarchiver {
     }
 
     /// Decodes and returns the tree of values previously encoded into `data`.
-    @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
-    @available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
-    @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
-    @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
     public class func unarchivedTopLevelValue<Value: ValueCodable>(of type: Value.Type = Value.self, with data: Data) throws -> Value? {
         let unarchiver = self.init(forReadingWith: data)
         defer { unarchiver.finishDecoding() }
         return try unarchiver.decodeTopLevelValue(forKey: NSKeyedArchiveRootObjectKey)
     }
 
-    fileprivate func setBoxType<Value: ValueCodable>(_: Value.Type, forTypeName name: String, force: Bool) {
-        let className = boxedClassNameFor(name)
-        guard force || `class`(forClassName: className) == nil else { return }
-        setClass(CodingBox<Value>.self, forClassName: className)
-    }
-
     /// Adds a type translation mapping to the receiver whereby values encoded
     /// with `name` are decoded as instances of `type` instead.
-    @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
-    @available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
-    @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
-    @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public func setBoxedType<Value: ValueCodable>(_: Value.Type, forTypeName name: String) {
-        setBoxType(Value.self, forTypeName: name, force: true)
+    public func setType<Value: ValueCodable>(_: Value.Type, forDecodingTypeNamed name: String) {
+        setClass(DecodingBox<Value>.self, forClassName: markerClassName(forName: name))
     }
 
 }
 
+@available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
+@available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
+@available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
+@available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
 extension NSKeyedArchiver {
 
     /// Returns a data object containing the encoded form of the instances whose
     /// root `value` is given.
-    @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
-    @available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
-    @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
-    @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public class func archivedData<Value: ValueCodable>(withRoot value: Value) -> Data {
+    public class func archivedData(withRoot value: ValueCodable?) -> Data {
         let data = NSMutableData()
 
         autoreleasepool {
@@ -192,16 +187,6 @@ extension NSKeyedArchiver {
         }
         
         return data as Data
-    }
-
-    /// Adds a type translation mapping to the receiver whereby instances of
-    /// `type` are encoded with `name` instead of their type names.
-    @available(iOS, introduced: 7.0, obsoleted: 11.0, message: "There should be a better way now.")
-    @available(macOS, introduced: 10.9, obsoleted: 10.13, message: "There should be a better way now.")
-    @available(watchOS, introduced: 2.0, obsoleted: 4.0, message: "There should be a better way now.")
-    @available(tvOS, introduced: 9.0, obsoleted: 11.0, message: "There should be a better way now.")
-    public func setName<Value: ValueCodable>(_ name: String, forBoxedType type: Value.Type = Value.self) {
-        setClassName(boxedClassNameFor(String(describing: type)), for: CodingBox<Value>.self)
     }
     
 }
