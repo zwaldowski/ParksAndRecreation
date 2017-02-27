@@ -125,6 +125,21 @@ A simple bridge to bridges concrete value types into `NSCoding`.
 
 Showing off the simple power of Swift iterators by performing breadth-first travel through the trees created by `UIView`, `UIViewController`, and `CALayer`.
 
+### [Floating Now Playing Bar](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/WeAllFloat)
+
+# WeAllFloat
+
+Experiment adding an accessory to UITabBarController, like Now Playing in Music.​app.
+
+## Features
+
+- Drop-in UITabBarController with a `paletteViewController` property
+- Palette is forwarded appearance (i.e., `viewWillAppear`) and trait collection events
+- Palette supports sizing through Auto Layout and `preferredContentSize` and animating changes to those
+- Can animate in, out, and between palette changes
+- Detects and supports highlighting of palette background on tap
+- Supports Interface Builder, 3D Touch, and modal view controllers
+
 ### Swift 2 only
 
 #### [BetterCoreDataInit](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/BetterCoreDataInit.playground)
