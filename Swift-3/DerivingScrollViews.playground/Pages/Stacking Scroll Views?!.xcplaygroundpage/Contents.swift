@@ -51,6 +51,7 @@ class StackedCollectionViewsController: UIViewController, UICollectionViewDataSo
         
         let stackView = UIStackView()
         stackView.axis = .vertical
+        stackView.spacing = 12
         stackView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(stackView)
         
