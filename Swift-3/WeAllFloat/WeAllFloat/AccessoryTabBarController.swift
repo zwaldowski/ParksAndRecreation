@@ -19,6 +19,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     private var palettePreferredHeight: NSLayoutConstraint!
     private var paletteHighlightGesture: UIGestureRecognizer!
     private var paletteHighlight: UIView?
+    private var paletteHairlineHeight: NSLayoutConstraint!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +28,13 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         container.translatesAutoresizingMaskIntoConstraints = false
         container.preservesSuperviewLayoutMargins = true
         view.insertSubview(container, belowSubview: tabBar)
+        self.paletteContainer = container
+
+        let hairline = UIView()
+        hairline.translatesAutoresizingMaskIntoConstraints = false
+        hairline.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.3)
+        container.contentView.addSubview(hairline)
+
         NSLayoutConstraint.activate([
             container.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             view.trailingAnchor.constraint(equalTo: container.trailingAnchor),
@@ -36,9 +44,15 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
                 c.priority = UILayoutPriorityFittingSizeLevel
                 self.palettePreferredHeight = c
                 return c
+            }(),
+            hairline.leadingAnchor.constraint(equalTo: paletteContainer.contentView.leadingAnchor),
+            paletteContainer.contentView.trailingAnchor.constraint(equalTo: hairline.trailingAnchor),
+            hairline.topAnchor.constraint(equalTo: paletteContainer.contentView.topAnchor), {
+                let c = hairline.heightAnchor.constraint(equalToConstant: effectiveHairline)
+                self.paletteHairlineHeight = c
+                return c
             }()
         ])
-        self.paletteContainer = container
 
         let paletteHighlightGesture = UILongPressGestureRecognizer(target: self, action: #selector(onPress))
         paletteHighlightGesture.minimumPressDuration = 0.01
@@ -71,6 +85,12 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         paletteViewController?.endAppearanceTransition()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        paletteHairlineHeight.constant = effectiveHairline
     }
 
     override func overrideTraitCollection(forChildViewController childViewController: UIViewController) -> UITraitCollection? {
@@ -277,6 +297,10 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         }
 
         updateHighlightingSupport(for: viewController.view)
+    }
+
+    private var effectiveHairline: CGFloat {
+        return 1 / max(traitCollection.displayScale, 1)
     }
 
     // MARK: - Content insets
