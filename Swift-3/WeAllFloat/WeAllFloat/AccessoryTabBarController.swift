@@ -23,13 +23,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let blurStyle: UIBlurEffectStyle
-        if #available(iOS 10.0, *) {
-            blurStyle = .regular
-        } else {
-            blurStyle = .light
-        }
-        let container = UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
+        let container = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
         container.translatesAutoresizingMaskIntoConstraints = false
         container.preservesSuperviewLayoutMargins = true
         view.insertSubview(container, belowSubview: tabBar)
