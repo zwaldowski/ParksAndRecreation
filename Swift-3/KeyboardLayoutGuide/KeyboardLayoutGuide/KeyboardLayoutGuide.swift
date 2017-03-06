@@ -8,15 +8,11 @@
 
 import UIKit
 
-private extension Notification.Name {
-
-    static let KeyboardLayoutGuideDidUpdate = Notification.Name(rawValue: "KeyboardLayoutGuideDidUpdateNotification")
-
-}
-
 /// A keyboard layout guide may be used as an item in Auto Layout, for its
 /// layout anchors, or may be queried for its length property.
 public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
+
+    private static let didUpdate = Notification.Name(rawValue: "KeyboardLayoutGuideDidUpdateNotification")
 
     // MARK: Lifecycle
 
@@ -26,7 +22,7 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
         notificationCenter.addObserver(self, selector: #selector(noteKeyboardShow), name: .UIKeyboardWillShow, object: nil)
         notificationCenter.addObserver(self, selector: #selector(noteKeyboardHide), name: .UIKeyboardWillHide, object: nil)
         notificationCenter.addObserver(self, selector: #selector(noteKeyboardShow), name: .UIKeyboardDidChangeFrame, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(noteAncestorGuideUpdate), name: .KeyboardLayoutGuideDidUpdate, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(noteAncestorGuideUpdate), name: KeyboardLayoutGuide.didUpdate, object: nil)
     }
 
     public override convenience init() {
@@ -98,30 +94,38 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
         ])
     }
 
-    @objc private func updateKeyboard(forUserInfo userInfo: [AnyHashable: Any]?) {
+    @objc
+    private func updateKeyboard(forUserInfo userInfo: [AnyHashable: Any]?) {
         let info = KeyboardInfo(userInfo: userInfo)
         guard info.isLocal else { return }
 
+        let oldOverlap = keyboardBottomConstraint?.constant ?? 0
+
         guard let view = owningView, !view.isEffectivelyDisappearing else { return }
-        keyboardBottomConstraint?.constant = info.overlap(in: view)
+        let newOverlap = info.overlap(in: view)
+
+        keyboardBottomConstraint?.constant = newOverlap
 
         info.animate {
+            self.avoidFirstResponderInScrollView?.contentInset.bottom += newOverlap - oldOverlap
             self.avoidFirstResponderInScrollView?.scrollFirstResponderToVisible(animated: true)
 
             view.layoutIfNeeded()
 
-            NotificationCenter.default.post(name: .KeyboardLayoutGuideDidUpdate, object: view, userInfo: userInfo)
+            NotificationCenter.default.post(name: KeyboardLayoutGuide.didUpdate, object: view, userInfo: userInfo)
         }
     }
-    
+
     // MARK: - Notifications
 
-    @objc private func noteKeyboardShow(note: Notification) {
+    @objc
+    private func noteKeyboardShow(note: Notification) {
         type(of: self).cancelPreviousPerformRequests(withTarget: self, selector: #selector(updateKeyboard), object: nil)
         updateKeyboard(forUserInfo: note.userInfo)
     }
 
-    @objc private func noteKeyboardHide(note: Notification) {
+    @objc
+    private func noteKeyboardHide(note: Notification) {
         perform(#selector(updateKeyboard), with: nil, afterDelay: 0, inModes: [ .commonModes ])
     }
 
@@ -137,11 +141,12 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
 // MARK: - UIViewController
 
 extension UIViewController {
-    
+
     private static var keyboardLayoutGuideKey = false
 
     /// For unit testing purposes only.
-    @nonobjc func makeKeyboardLayoutGuide(notificationCenter: NotificationCenter) -> KeyboardLayoutGuide {
+    @nonobjc
+    internal func makeKeyboardLayoutGuide(notificationCenter: NotificationCenter) -> KeyboardLayoutGuide {
         assert(isViewLoaded, "This layout guide should not be accessed before the view is loaded.")
 
         let guide = KeyboardLayoutGuide(notificationCenter: notificationCenter)
@@ -164,7 +169,8 @@ extension UIViewController {
     /// margins of its view. When the keyboard is active.
     ///
     /// - seealso: KeyboardLayoutGuide
-    @nonobjc public var keyboardLayoutGuide: KeyboardLayoutGuide {
+    @nonobjc
+    public var keyboardLayoutGuide: KeyboardLayoutGuide {
         if let guide = objc_getAssociatedObject(self, &UIViewController.keyboardLayoutGuideKey) as? KeyboardLayoutGuide {
             return guide
         }
@@ -173,10 +179,10 @@ extension UIViewController {
         objc_setAssociatedObject(self, &UIViewController.keyboardLayoutGuideKey, guide, .OBJC_ASSOCIATION_ASSIGN)
         return guide
     }
-    
+
 }
 
-// MARK: - Helpers
+// MARK: - Extensions
 
 private extension UIView {
 
@@ -237,5 +243,5 @@ private struct KeyboardInfo {
         let localMinY = target.convert(endFrame, from: UIScreen.main.coordinateSpace).minY
         return max(view.frame.maxY - localMinY, 0)
     }
-    
+
 }
