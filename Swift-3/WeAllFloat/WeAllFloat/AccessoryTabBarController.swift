@@ -338,45 +338,10 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
 
     // MARK: - Highlight support
 
-    private final class PaletteHighlightView: UIView {
-
-        private func commonInit() {
-            layer.setValue(false, forKey: "allowsGroupBlending")
-
-            for (compositingColor, compositingFilter) in [
-                (#colorLiteral(red: 0.6642268896, green: 0.6642268896, blue: 0.6642268896, alpha: 1), "colorBurnBlendMode"),
-                (#colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.04), "plusD"),
-            ] {
-                let sublayer = CALayer()
-                sublayer.backgroundColor = compositingColor.cgColor
-                sublayer.compositingFilter = compositingFilter
-                layer.addSublayer(sublayer)
-            }
-        }
-
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            commonInit()
-        }
-
-        required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-            commonInit()
-        }
-
-        override func layoutSublayers(of layer: CALayer) {
-            guard layer === self.layer else { return }
-            for sublayer in layer.sublayers ?? [] {
-                sublayer.frame = layer.bounds
-            }
-        }
-
-    }
-
     private var isHighlighted = false {
         didSet {
             if isHighlighted, paletteHighlight == nil {
-                let paletteHighlight = PaletteHighlightView()
+                let paletteHighlight = BackgroundBlendingView(filters: (.colorBurn, #colorLiteral(red: 0.6642268896, green: 0.6642268896, blue: 0.6642268896, alpha: 1)), (.plusDarker, #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.220290493)))
                 paletteHighlight.translatesAutoresizingMaskIntoConstraints = false
                 paletteContainer.insertSubview(paletteHighlight, at: 0)
                 NSLayoutConstraint.activate([

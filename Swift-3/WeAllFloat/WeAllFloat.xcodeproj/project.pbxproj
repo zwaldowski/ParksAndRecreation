@@ -16,6 +16,7 @@
 		DBCEFED91E5FACCB0066916F /* AccessoryTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCEFED81E5FACCB0066916F /* AccessoryTabBarController.swift */; };
 		DBCEFEF51E6085310066916F /* ThirdViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCEFEF41E6085310066916F /* ThirdViewController.swift */; };
 		DBE038EB1E637E4A00D3D0F4 /* PaletteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE038EA1E637E4A00D3D0F4 /* PaletteViewController.swift */; };
+		DBF21F151E6771BA00859D89 /* BackgroundBlendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF21F141E6771BA00859D89 /* BackgroundBlendingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		DBCEFED81E5FACCB0066916F /* AccessoryTabBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessoryTabBarController.swift; sourceTree = "<group>"; };
 		DBCEFEF41E6085310066916F /* ThirdViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThirdViewController.swift; sourceTree = "<group>"; };
 		DBE038EA1E637E4A00D3D0F4 /* PaletteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaletteViewController.swift; sourceTree = "<group>"; };
+		DBF21F141E6771BA00859D89 /* BackgroundBlendingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackgroundBlendingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +70,7 @@
 				DBCEFEF41E6085310066916F /* ThirdViewController.swift */,
 				DBE038EA1E637E4A00D3D0F4 /* PaletteViewController.swift */,
 				DBCEFED81E5FACCB0066916F /* AccessoryTabBarController.swift */,
+				DBF21F141E6771BA00859D89 /* BackgroundBlendingView.swift */,
 				DBCEFEC81E5FA5270066916F /* Main.storyboard */,
 				DBCEFECB1E5FA5270066916F /* Assets.xcassets */,
 				DBCEFECD1E5FA5270066916F /* LaunchScreen.storyboard */,
@@ -155,6 +158,7 @@
 				DBCEFEC71E5FA5270066916F /* SecondViewController.swift in Sources */,
 				DBCEFEF51E6085310066916F /* ThirdViewController.swift in Sources */,
 				DBCEFEC31E5FA5270066916F /* AppDelegate.swift in Sources */,
+				DBF21F151E6771BA00859D89 /* BackgroundBlendingView.swift in Sources */,
 				DBCEFEC51E5FA5270066916F /* FirstViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
