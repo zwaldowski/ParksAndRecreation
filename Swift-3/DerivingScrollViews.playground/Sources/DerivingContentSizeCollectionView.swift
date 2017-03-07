@@ -55,9 +55,7 @@ public final class DerivingContentSizeCollectionView: UICollectionView, ScrollVi
             return super.frame
         }
         set {
-            helper.whileClippingBounds {
-                super.frame = newValue
-            }
+            super.frame = newValue
         }
     }
 
@@ -66,9 +64,7 @@ public final class DerivingContentSizeCollectionView: UICollectionView, ScrollVi
             return helper.shouldClipBounds ? helper.visibleBounds(forOriginalBounds: super.bounds) : super.bounds
         }
         set {
-            helper.whileClippingBounds {
-                super.bounds = newValue
-            }
+            super.bounds = newValue
         }
     }
 
@@ -115,7 +111,7 @@ public final class DerivingContentSizeCollectionView: UICollectionView, ScrollVi
         //  - collection view layout invalidation
         //  - set the "scheduledUpdateVisibleCells" flag
         let oldBounds = super.bounds
-        super.bounds = helper.visibleBounds(forOriginalBounds: oldBounds)
+        super.bounds = oldBounds.insetBy(dx: 0, dy: .ulpOfOne)
         super.bounds = oldBounds
     }
 

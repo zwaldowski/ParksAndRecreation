@@ -13,8 +13,8 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
     private let helper = ScrollViewDerivedBoundsHelper()
 
     private func commonInit() {
-        helper.isEnabled = !isScrollEnabled
         helper.owner = self
+        helper.isEnabled = !isScrollEnabled
     }
 
     public override init(frame: CGRect, style: UITableViewStyle) {
@@ -55,9 +55,7 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
             return super.frame
         }
         set {
-            helper.whileClippingBounds {
-                super.frame = newValue
-            }
+            super.frame = newValue
         }
     }
 
@@ -66,9 +64,7 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
             return helper.shouldClipBounds ? helper.visibleBounds(forOriginalBounds: super.bounds) : super.bounds
         }
         set {
-            helper.whileClippingBounds {
-                super.bounds = newValue
-            }
+            super.bounds = newValue
         }
     }
 
@@ -104,8 +100,7 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
         guard helper.shouldSizeToFit else {
             return super.intrinsicContentSize
         }
-
-        layoutIfNeeded()
+        
         return CGSize(width: UIViewNoIntrinsicMetric, height: contentSize.height)
     }
 
@@ -116,7 +111,7 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
         //  - collection view layout invalidation
         //  - set the "scheduledUpdateVisibleCells" flag
         let oldBounds = super.bounds
-        super.bounds = helper.visibleBounds(forOriginalBounds: oldBounds)
+        super.bounds = oldBounds.insetBy(dx: 0, dy: .ulpOfOne)
         super.bounds = oldBounds
     }
 
