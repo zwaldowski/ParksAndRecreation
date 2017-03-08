@@ -45,9 +45,9 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
                 self.palettePreferredHeight = c
                 return c
             }(),
-            hairline.leadingAnchor.constraint(equalTo: paletteContainer.contentView.leadingAnchor),
-            paletteContainer.contentView.trailingAnchor.constraint(equalTo: hairline.trailingAnchor),
-            hairline.topAnchor.constraint(equalTo: paletteContainer.contentView.topAnchor), {
+            hairline.leadingAnchor.constraint(equalTo: paletteContainer.leadingAnchor),
+            paletteContainer.trailingAnchor.constraint(equalTo: hairline.trailingAnchor),
+            hairline.topAnchor.constraint(equalTo: paletteContainer.topAnchor), {
                 let c = hairline.heightAnchor.constraint(equalToConstant: effectiveHairline)
                 self.paletteHairlineHeight = c
                 return c
@@ -110,7 +110,9 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     }
 
     override func updateViewConstraints() {
-        palettePreferredHeight.constant = paletteViewController?.view.systemLayoutSizeFitting(self.tabBar.frame.size, withHorizontalFittingPriority: UILayoutPriorityRequired, verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height ?? 0
+        if let paletteView = paletteViewController?.viewIfLoaded, !paletteView.translatesAutoresizingMaskIntoConstraints {
+            palettePreferredHeight.constant = paletteView.systemLayoutSizeFitting(CGSize(width: view.bounds.width, height: 0), withHorizontalFittingPriority: UILayoutPriorityRequired, verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
+        }
 
         super.updateViewConstraints()
     }
@@ -284,16 +286,16 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
             palettePreferredHeight.constant = viewController.preferredContentSize.height
         } else {
             NSLayoutConstraint.activate([
-                viewController.view.leadingAnchor.constraint(equalTo: paletteContainer.contentView.leadingAnchor),
-                paletteContainer.contentView.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
-                viewController.view.topAnchor.constraint(equalTo: paletteContainer.contentView.topAnchor),
-                paletteContainer.contentView.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor)
+                viewController.view.leadingAnchor.constraint(equalTo: paletteContainer.leadingAnchor),
+                paletteContainer.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
+                viewController.view.topAnchor.constraint(equalTo: paletteContainer.topAnchor),
+                paletteContainer.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor)
             ])
 
             // This serves a dual purpose: give the palette container a more
             // accurate ambuiguty-breaker, and activating the monitor for
             // systemLayoutFittingSizeDidChange(forChildContentContainer:).
-            palettePreferredHeight.constant = viewController.view.systemLayoutSizeFitting(self.tabBar.frame.size, withHorizontalFittingPriority: UILayoutPriorityRequired, verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
+            palettePreferredHeight.constant = viewController.view.systemLayoutSizeFitting(CGSize(width: view.bounds.width, height: 0), withHorizontalFittingPriority: UILayoutPriorityRequired, verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
         }
 
         updateHighlightingSupport(for: viewController.view)
