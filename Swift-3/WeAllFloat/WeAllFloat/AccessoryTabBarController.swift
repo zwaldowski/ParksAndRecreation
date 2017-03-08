@@ -164,6 +164,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     /// If `animated` is `true`, will also reflow the content of the selected
     /// view controller.
     func setPaletteViewController(_ newValue: UIViewController?, animated: Bool) {
+        let paletteTransformAtEnd: CGAffineTransform
         let completion: (Bool) -> Void
 
         let oldValue = paletteViewController
@@ -186,33 +187,33 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
             // offscreen.
             startInstalling(newValue, animated: animated)
 
-            UIView.performWithoutAnimation(view.layoutIfNeeded)
-
-            paletteContainer.transform = animated ? CGAffineTransform(translationX: 0, y: paletteContainer.bounds.height) : .identity
-
-            completion = { _ in
-                self.finishInstalling(newValue)
+            UIView.performWithoutAnimation {
+                self.view.layoutIfNeeded()
+                paletteContainer.transform = animated ? CGAffineTransform(translationX: 0, y: paletteContainer.bounds.height) : .identity
             }
+
+            paletteTransformAtEnd = .identity
+
+            completion = { _ in }
         case let (oldValue?, newValue?) where oldValue !== newValue:
             // Transition from a to b. Not really animated, but this is expected
             // to be rare; could throw in fade or something instead.
             startUninstalling(oldValue, animated: animated)
             startInstalling(newValue, animated: animated)
 
+            paletteTransformAtEnd = .identity
+
             completion = { _ in
                 self.finishUninstalling(oldValue)
-                self.finishInstalling(newValue)
             }
         case (let oldValue?, nil):
             // Collapse the palette to animate offscreen - don't slide so we
             // don't do a layout pass on the moribund view controller.
             startUninstalling(oldValue, animated: animated)
 
-            let constraint = paletteContainer.contentView.heightAnchor.constraint(equalToConstant: 0)
-            constraint.isActive = true
+            paletteTransformAtEnd = animated ? CGAffineTransform(translationX: 0, y: paletteContainer.bounds.height) : .identity
 
             completion = { _ in
-                constraint.isActive = false
                 self.finishUninstalling(oldValue)
             }
         default:
@@ -226,7 +227,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         // Rather than duration = 0 when not animated, spare extra layout.
         if animated {
             UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: .beginFromCurrentState, animations: {
-                self.paletteContainer.transform = .identity
+                self.paletteContainer.transform = paletteTransformAtEnd
                 self.view.layoutIfNeeded()
             }, completion: completion)
         } else {
@@ -245,31 +246,30 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         guard isViewLoaded else { return }
 
         newValue.beginAppearanceTransition(true, animated: animated)
+        defer { newValue.endAppearanceTransition() }
 
         UIView.performWithoutAnimation {
             self.installView(of: newValue)
         }
     }
 
-    private func finishInstalling(_ newValue: UIViewController) {
-        assert(isViewLoaded)
-
-        newValue.endAppearanceTransition()
-    }
-
     private func startUninstalling(_ oldValue: UIViewController, animated: Bool) {
-        if viewIfLoaded?.window != nil {
+        let isLive = viewIfLoaded?.window != nil
+        if isLive {
             oldValue.beginAppearanceTransition(false, animated: animated)
         }
 
         oldValue.willMove(toParentViewController: nil)
+
+        if isLive {
+            oldValue.endAppearanceTransition()
+        }
     }
 
     private func finishUninstalling(_ oldValue: UIViewController) {
         assert(isViewLoaded)
 
         oldValue.view.removeFromSuperview()
-        oldValue.endAppearanceTransition()
 
         palettePreferredHeight.constant = 0
         updateHighlightingSupport(for: nil)
