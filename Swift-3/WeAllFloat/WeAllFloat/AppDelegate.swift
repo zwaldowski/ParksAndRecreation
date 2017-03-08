@@ -14,11 +14,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
-        if let tabBarController = window?.rootViewController as? AccessoryTabBarController {
-            tabBarController.setPaletteViewController(tabBarController.storyboard?.instantiateViewController(withIdentifier: "Root:Palette"), animated: false)
-        }
-
         return true
+    }
+
+    @IBAction private func togglePalette(sender: UISwitch) {
+        guard let tabBarController = window?.rootViewController as? AccessoryTabBarController else { return }
+        let paletteViewController: UIViewController? = sender.isOn ? tabBarController.storyboard?.instantiateViewController(withIdentifier: "Root:Palette") : nil
+        tabBarController.setPaletteViewController(paletteViewController, animated: true)
     }
 
 }
