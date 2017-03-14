@@ -12,7 +12,7 @@ final class BackgroundBlendingView: UIView {
 
     // @c CATransformLayer is documented to never draw. This serves as a
     // performance optimization.
-    override open class var layerClass: AnyClass {
+    override final class var layerClass: AnyClass {
         return CATransformLayer.self
     }
 
@@ -56,12 +56,11 @@ final class BackgroundBlendingView: UIView {
     init(filters: Filter...) {
         blendingLayers = filters.map { (filter, color) in
             let sublayer = CALayer()
-            sublayer.compositingFilter = filter.rawValue
             sublayer.backgroundColor = color.cgColor
+            sublayer.compositingFilter = filter.rawValue
             return sublayer
         }
         super.init(frame: .zero)
-        layer.setValue(false, forKey: "allowsGroupBlending")
         blendingLayers.forEach(layer.addSublayer)
     }
 
