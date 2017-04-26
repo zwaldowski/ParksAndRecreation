@@ -1,5 +1,5 @@
 //
-//  UIScrollView+KeyboardAvoidance
+//  UIScrollView+KeyboardAvoidance.swift
 //  KeyboardLayoutGuide
 //
 //  Created by Zachary Waldowski on 5/3/16.
@@ -10,7 +10,8 @@ import UIKit
 
 private extension UIView {
 
-    @nonobjc func findFirstResponder() -> UIView? {
+    @nonobjc @available(*, deprecated)
+    func findFirstResponder() -> UIView? {
         guard !isFirstResponder else {
             return self
         }
@@ -18,7 +19,8 @@ private extension UIView {
         return subviews.lazy.flatMap { $0.findFirstResponder() }.first
     }
 
-    @nonobjc func containsFirstResponder() -> Bool {
+    @nonobjc
+    func containsFirstResponder() -> Bool {
         guard !isFirstResponder else {
             return true
         }
@@ -34,16 +36,8 @@ private extension UIView {
 
 extension UIScrollView {
 
-    fileprivate struct Constants {
-        static let minimumVisiblePadding: CGFloat = 8
-    }
-
-    func scrollFirstResponderToVisible(animated: Bool) {
-        guard let firstResponder = findFirstResponder() else { return }
-
-        let rect = convert(firstResponder.bounds, from: firstResponder).insetBy(dx: 0, dy: -Constants.minimumVisiblePadding)
-        scrollRectToVisible(rect, animated: animated)
-    }
+    @objc(bnr_scrollFirstResponderToVisible:)
+    func scrollFirstResponderToVisible(animated: Bool) {}
 
 }
 

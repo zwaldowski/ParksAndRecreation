@@ -23,10 +23,7 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
         notificationCenter.addObserver(self, selector: #selector(noteKeyboardHide), name: .UIKeyboardWillHide, object: nil)
         notificationCenter.addObserver(self, selector: #selector(noteKeyboardShow), name: .UIKeyboardDidChangeFrame, object: nil)
         notificationCenter.addObserver(self, selector: #selector(noteAncestorGuideUpdate), name: KeyboardLayoutGuide.didUpdate, object: nil)
-    }
-
-    public override convenience init() {
-        self.init(notificationCenter: .default)
+        notificationCenter.addObserver(self, selector: #selector(noteTextFieldDidEndEditing), name: .UITextFieldTextDidEndEditing, object: nil)
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -35,7 +32,7 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
         commonInit()
     }
 
-    init(notificationCenter: NotificationCenter) {
+    init(notificationCenter: NotificationCenter = .default) {
         self.notificationCenter = notificationCenter
         super.init()
         commonInit()
@@ -72,6 +69,7 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
     // MARK: Actions
 
     private var keyboardBottomConstraint: NSLayoutConstraint?
+    private var lastScrollViewInsetDelta: CGFloat = 0
 
     private func activateConstraints() {
         guard let view = owningView else {
@@ -97,30 +95,26 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
     @objc
     private func updateKeyboard(forUserInfo userInfo: [AnyHashable: Any]?) {
         let info = KeyboardInfo(userInfo: userInfo)
-        guard info.isLocal else { return }
+        guard info.isLocal, let view = owningView, !view.isEffectivelyDisappearing else { return }
 
-        let oldOverlap = keyboardBottomConstraint?.constant ?? 0
+        UIView.performWithoutAnimation(view.layoutIfNeeded)
 
-        guard let view = owningView, !view.isEffectivelyDisappearing else { return }
-        let newOverlap = info.overlap(in: view)
-
-        keyboardBottomConstraint?.constant = newOverlap
+        keyboardBottomConstraint?.constant = info.overlap(in: view)
 
         info.animate {
-            self.avoidFirstResponderInScrollView?.contentInset.bottom += newOverlap - oldOverlap
-            self.avoidFirstResponderInScrollView?.scrollFirstResponderToVisible(animated: true)
+            info.adjustForOverlap(in: avoidFirstResponderInScrollView, lastAppliedInset: &lastScrollViewInsetDelta)
 
             view.layoutIfNeeded()
-
-            NotificationCenter.default.post(name: KeyboardLayoutGuide.didUpdate, object: view, userInfo: userInfo)
         }
+
+        NotificationCenter.default.post(name: KeyboardLayoutGuide.didUpdate, object: view, userInfo: userInfo)
     }
 
     // MARK: - Notifications
 
     @objc
     private func noteKeyboardShow(note: Notification) {
-        type(of: self).cancelPreviousPerformRequests(withTarget: self, selector: #selector(updateKeyboard), object: nil)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(updateKeyboard), object: nil)
         updateKeyboard(forUserInfo: note.userInfo)
     }
 
@@ -129,11 +123,22 @@ public final class KeyboardLayoutGuide: UILayoutGuide, UILayoutSupport {
         perform(#selector(updateKeyboard), with: nil, afterDelay: 0, inModes: [ .commonModes ])
     }
 
-    @objc private func noteAncestorGuideUpdate(note: Notification) {
+    @objc
+    private func noteAncestorGuideUpdate(note: Notification) {
         guard let view = owningView, let ancestorView = note.object as? UIView,
             view !== ancestorView, view.isDescendant(of: ancestorView) else { return }
 
-        keyboardBottomConstraint?.constant = KeyboardInfo(userInfo: note.userInfo).overlap(in: view)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(updateKeyboard), object: nil)
+        updateKeyboard(forUserInfo: note.userInfo)
+    }
+
+    // Workaround for <rdar://problem/30978412> UIKit > Bug > UITextField contents animate in when layout performed during editing end
+    @objc
+    private func noteTextFieldDidEndEditing(_ note: Notification) {
+        guard let view = owningView, let textField = note.object as? UITextField,
+            view !== textField, textField.isDescendant(of: view), !view.isEffectivelyDisappearing else { return }
+
+        UIView.performWithoutAnimation(textField.layoutIfNeeded)
     }
 
 }
@@ -195,6 +200,15 @@ private extension UIView {
         return nil
     }
 
+    func findEnclosingScrollView() -> UIScrollView? {
+        var responder = next
+        while let current = responder {
+            if let scrollView = current as? UIScrollView { return scrollView }
+            responder = current.next
+        }
+        return nil
+    }
+
     var isEffectivelyInPopover: Bool {
         guard let vc = findNextViewController() else { return false }
         var presenter = vc.presentingViewController
@@ -207,6 +221,7 @@ private extension UIView {
     }
 
     var isEffectivelyDisappearing: Bool {
+        guard window != nil else { return true }
         guard let vc = findNextViewController() else { return false }
         return vc.isBeingDismissed || vc.isMovingFromParentViewController
     }
@@ -227,14 +242,16 @@ private struct KeyboardInfo {
         self.isLocal = (userInfo?[UIKeyboardIsLocalUserInfoKey] as? Bool) ?? true
     }
 
-    func animate(by animations: @escaping() -> Void) {
+    func animate(by animations: () -> Void) {
         // When performing a keyboard update around a screen rotation animation,
         // UIKit disables animations and sends a duration of 0.
-        //
-        // For the keyboard, we're just going to assume a layout pass happens
-        // soon. (And maybe pray. Just a little.)
-        guard UIView.areAnimationsEnabled && !animationDuration.isZero else { return }
-        UIView.animate(withDuration: animationDuration, delay: 0, options: [ animationCurve, .beginFromCurrentState ], animations: animations)
+        guard UIView.areAnimationsEnabled else {
+            return animations()
+        }
+
+        withoutActuallyEscaping(animations) {
+            UIView.animate(withDuration: animationDuration, delay: 0, options: [ animationCurve, .beginFromCurrentState ], animations: $0)
+        }
     }
 
     // Modeled after -[UIPeripheralHost getVerticalOverlapForView:usingKeyboardInfo:]
@@ -242,6 +259,22 @@ private struct KeyboardInfo {
         guard !view.isEffectivelyInPopover, !endFrame.isEmpty, let target = view.superview else { return 0 }
         let localMinY = target.convert(endFrame, from: UIScreen.main.coordinateSpace).minY
         return max(view.frame.maxY - localMinY, 0)
+    }
+
+    // Modeled after -[UIScrollView _adjustForAutomaticKeyboardInfo:animated:lastAdjustment:].
+    func adjustForOverlap(in scrollView: UIScrollView?, lastAppliedInset: inout CGFloat) {
+        guard let scrollView = scrollView, scrollView.findEnclosingScrollView() == nil else { return }
+
+        let newOverlap = overlap(in: scrollView)
+
+        let baseline = scrollView.contentInset.bottom - lastAppliedInset
+        let newInset = max(baseline, newOverlap)
+        lastAppliedInset = newInset - baseline
+
+        scrollView.scrollIndicatorInsets.bottom += newInset - scrollView.contentInset.bottom
+        scrollView.contentInset.bottom = newInset
+
+        scrollView.scrollFirstResponderToVisible(animated: false)
     }
 
 }
