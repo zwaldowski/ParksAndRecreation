@@ -171,10 +171,13 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         paletteViewController = newValue
 
         switch (oldValue, newValue) {
-        case (let oldValue, let newValue) where !isViewLoaded && oldValue !== newValue:
-            // No use setting up views until viewDidLoad.
+        case (let oldValue, let newValue) where !isViewLoaded:
+            // No use setting up views until viewDidLoad...
+            guard oldValue !== newValue else { return }
+
             if let oldValue = oldValue {
                 startUninstalling(oldValue, animated: false)
+                oldValue.removeFromParentViewController()
             }
 
             if let newValue = newValue {
@@ -236,10 +239,8 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     }
 
     private func startInstalling(_ newValue: UIViewController, animated: Bool) {
-        if newValue.parent != nil {
-            newValue.willMove(toParentViewController: self)
-            newValue.removeFromParentViewController()
-        }
+        newValue.willMove(toParentViewController: self)
+        newValue.removeFromParentViewController()
         newValue.setValue(self, forKeyPath: "parentViewController")
         defer { newValue.didMove(toParentViewController: self) }
 
@@ -254,24 +255,28 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     }
 
     private func startUninstalling(_ oldValue: UIViewController, animated: Bool) {
-        let isLive = viewIfLoaded?.window != nil
-        if isLive {
-            oldValue.beginAppearanceTransition(false, animated: animated)
-        }
-
         oldValue.willMove(toParentViewController: nil)
 
-        if isLive {
-            oldValue.endAppearanceTransition()
+        if viewIfLoaded?.window != nil {
+            oldValue.beginAppearanceTransition(false, animated: animated)
         }
     }
 
     private func finishUninstalling(_ oldValue: UIViewController) {
         assert(isViewLoaded)
 
+        let isLive = view.window != nil
+
         oldValue.view.removeFromSuperview()
 
+        if isLive {
+            oldValue.endAppearanceTransition()
+        }
+
+        oldValue.removeFromParentViewController()
+
         palettePreferredHeight.constant = 0
+
         updateHighlightingSupport(for: nil)
     }
 
@@ -313,7 +318,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         }() ?? child else { return }
 
         child.view.setNeedsLayout()
-        
+
         if animated, UIView.areAnimationsEnabled {
             view.layoutIfNeeded()
         }

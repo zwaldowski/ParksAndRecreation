@@ -44,6 +44,18 @@ final class PaletteViewController: UIViewController {
         print("Palette view did disappear")
     }
 
+    override func willMove(toParentViewController parent: UIViewController?) {
+        super.willMove(toParentViewController: parent)
+
+        print("Palette will move to \(String(describing: parent))")
+    }
+
+    override func didMove(toParentViewController parent: UIViewController?) {
+        super.willMove(toParentViewController: parent)
+
+        print("Palette did move to \(String(describing: parent))")
+    }
+
     @IBAction func shrink(_ sender: UIButton) {
         setPreferredHeightAnimated(32) { _ in
             sender.isEnabled = false
