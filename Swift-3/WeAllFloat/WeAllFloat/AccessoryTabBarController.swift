@@ -228,14 +228,10 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         setNeedsUpdateEdgeInsets(forChild: selectedViewController, animated: false)
 
         // Rather than duration = 0 when not animated, spare extra layout.
-        if animated {
-            UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: .beginFromCurrentState, animations: {
-                self.paletteContainer.transform = paletteTransformAtEnd
-                self.view.layoutIfNeeded()
-            }, completion: completion)
-        } else {
-            completion(true)
-        }
+        UIView.animate(withDuration: animated ? 0.35 : 0, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0, options: .beginFromCurrentState, animations: {
+            self.paletteContainer.transform = paletteTransformAtEnd
+            self.view.layoutIfNeeded()
+        }, completion: completion)
     }
 
     private func startInstalling(_ newValue: UIViewController, animated: Bool) {
@@ -312,6 +308,13 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
 
     // MARK: - Content insets
 
+    fileprivate func insetForPalette(inChild child: UIViewController?) -> CGFloat {
+        guard let child = child, child.edgesForExtendedLayout.contains(.bottom), paletteViewController != nil else {
+            return 0
+        }
+        return paletteContainer.bounds.height
+    }
+
     private func setNeedsUpdateEdgeInsets(forChild child: UIViewController?, animated: Bool) {
         guard let child = {
             moreNavigationController.viewIfLoaded?.superview != nil ? moreNavigationController : nil
@@ -336,9 +339,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
             insets.bottom += tabBar.bounds.height
         }
 
-        if let paletteContainer = paletteContainer, child.edgesForExtendedLayout.contains(.bottom) {
-            insets.bottom += paletteContainer.bounds.height
-        }
+        insets.bottom += insetForPalette(inChild: child)
 
         return insets
     }
