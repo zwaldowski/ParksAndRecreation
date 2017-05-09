@@ -18,7 +18,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     private var paletteContainer: UIVisualEffectView!
     private var palettePreferredHeight: NSLayoutConstraint!
     private var paletteHighlightGesture: UIGestureRecognizer!
-    private var paletteHighlight: UIView?
+    private var paletteHighlight: HighlightingFilter!
     private var paletteHairlineHeight: NSLayoutConstraint!
 
     override func viewDidLoad() {
@@ -29,6 +29,8 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         container.preservesSuperviewLayoutMargins = true
         view.insertSubview(container, belowSubview: tabBar)
         self.paletteContainer = container
+
+        paletteHighlight = VibrantLighterHighlight(in: paletteContainer)
 
         let hairline = UIView()
         hairline.translatesAutoresizingMaskIntoConstraints = false
@@ -346,37 +348,20 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
 
     // MARK: - Highlight support
 
-    private var isHighlighted = false {
-        didSet {
-            if isHighlighted, paletteHighlight == nil {
-                let paletteHighlight = BackgroundBlendingView(filters: (.colorBurn, #colorLiteral(red: 0.6642268896, green: 0.6642268896, blue: 0.6642268896, alpha: 1)), (.plusDarker, #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.220290493)))
-                paletteHighlight.translatesAutoresizingMaskIntoConstraints = false
-                paletteContainer.insertSubview(paletteHighlight, at: 0)
-                NSLayoutConstraint.activate([
-                    paletteHighlight.leadingAnchor.constraint(equalTo: paletteContainer.leadingAnchor),
-                    paletteContainer.trailingAnchor.constraint(equalTo: paletteHighlight.trailingAnchor),
-                    paletteHighlight.topAnchor.constraint(equalTo: paletteContainer.topAnchor),
-                    paletteContainer.bottomAnchor.constraint(equalTo: paletteHighlight.bottomAnchor),
-                ])
-                self.paletteHighlight = paletteHighlight
-            }
-            paletteHighlight?.isHidden = !isHighlighted
-        }
-    }
-
     private func updateHighlightingSupport(for view: UIView?) {
-        isHighlighted = false
+        paletteHighlight.isActive = false
         paletteHighlightGesture.isEnabled = view?.gestureRecognizers?.contains(where: { (gestureRecognizer) in
             (gestureRecognizer is UITapGestureRecognizer) || (gestureRecognizer is UILongPressGestureRecognizer)
         }) ?? false
     }
 
-    @objc private func onPress(sender: UILongPressGestureRecognizer) {
+    @objc
+    private func onPress(sender: UILongPressGestureRecognizer) {
         switch sender.state {
         case .began, .changed:
-            isHighlighted = true
+            paletteHighlight.isActive = true
         case _:
-            isHighlighted = false
+            paletteHighlight.isActive = false
         }
     }
 

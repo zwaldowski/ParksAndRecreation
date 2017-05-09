@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DB2C4F971EB39B790004A396 /* HighlightingFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2C4F961EB39B790004A396 /* HighlightingFilter.swift */; };
 		DBCEFEC31E5FA5270066916F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCEFEC21E5FA5270066916F /* AppDelegate.swift */; };
 		DBCEFEC51E5FA5270066916F /* FirstViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCEFEC41E5FA5270066916F /* FirstViewController.swift */; };
 		DBCEFEC71E5FA5270066916F /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCEFEC61E5FA5270066916F /* SecondViewController.swift */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DB2C4F961EB39B790004A396 /* HighlightingFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HighlightingFilter.swift; sourceTree = "<group>"; };
 		DBCEFEBF1E5FA5270066916F /* WeAllFloat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeAllFloat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBCEFEC21E5FA5270066916F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DBCEFEC41E5FA5270066916F /* FirstViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstViewController.swift; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 				DBE038EA1E637E4A00D3D0F4 /* PaletteViewController.swift */,
 				DBCEFED81E5FACCB0066916F /* AccessoryTabBarController.swift */,
 				DBF21F141E6771BA00859D89 /* BackgroundBlendingView.swift */,
+				DB2C4F961EB39B790004A396 /* HighlightingFilter.swift */,
 				DBCEFEC81E5FA5270066916F /* Main.storyboard */,
 				DBCEFECB1E5FA5270066916F /* Assets.xcassets */,
 				DBCEFECD1E5FA5270066916F /* LaunchScreen.storyboard */,
@@ -160,6 +163,7 @@
 				DBCEFEC31E5FA5270066916F /* AppDelegate.swift in Sources */,
 				DBF21F151E6771BA00859D89 /* BackgroundBlendingView.swift in Sources */,
 				DBCEFEC51E5FA5270066916F /* FirstViewController.swift in Sources */,
+				DB2C4F971EB39B790004A396 /* HighlightingFilter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
