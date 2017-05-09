@@ -53,7 +53,7 @@ extension HighlightingFilter {
 /// Based off how a custom `UIAlertController` lightens its buttons.
 struct VibrantLighterHighlight: HighlightingFilter {
 
-    unowned let containerView: UIView
+    let containerView: UIView
     var highlightView: UIView?
 
     init(in containerView: UIView) {

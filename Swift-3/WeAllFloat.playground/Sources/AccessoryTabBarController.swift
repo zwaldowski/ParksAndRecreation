@@ -13,7 +13,7 @@ import UIKit
 ///
 /// Use of the palette properly updates `UIViewController.bottomLayoutGuide`,
 /// including animations, so simply use it as normal.
-final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDelegate {
+public final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDelegate {
 
     private var paletteContainer: UIVisualEffectView!
     private var palettePreferredHeight: NSLayoutConstraint!
@@ -21,7 +21,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     private var paletteHighlight: HighlightingFilter!
     private var paletteHairlineHeight: NSLayoutConstraint!
 
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         let container = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
@@ -30,7 +30,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         view.insertSubview(container, belowSubview: tabBar)
         self.paletteContainer = container
 
-        paletteHighlight = VibrantLighterHighlight(in: paletteContainer)
+        paletteHighlight = VibrantLighterHighlight(in: container)
 
         let hairline = UIView()
         hairline.translatesAutoresizingMaskIntoConstraints = false
@@ -69,33 +69,33 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         }
     }
 
-    override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         paletteViewController?.beginAppearanceTransition(true, animated: animated)
     }
 
-    override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         paletteViewController?.endAppearanceTransition()
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
+    override public func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         paletteViewController?.beginAppearanceTransition(false, animated: animated)
     }
 
-    override func viewDidDisappear(_ animated: Bool) {
+    override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         paletteViewController?.endAppearanceTransition()
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
         paletteHairlineHeight.constant = effectiveHairline
     }
 
-    override func overrideTraitCollection(forChildViewController childViewController: UIViewController) -> UITraitCollection? {
+    override public func overrideTraitCollection(forChildViewController childViewController: UIViewController) -> UITraitCollection? {
         let overrideTraitCollection = super.overrideTraitCollection(forChildViewController: childViewController)
         guard childViewController === paletteViewController else { return overrideTraitCollection }
         var toCombine = [
@@ -111,7 +111,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         return UITraitCollection(traitsFrom: toCombine)
     }
 
-    override func updateViewConstraints() {
+    override public func updateViewConstraints() {
         if let paletteView = paletteViewController?.viewIfLoaded, !paletteView.translatesAutoresizingMaskIntoConstraints {
             palettePreferredHeight.constant = paletteView.systemLayoutSizeFitting(CGSize(width: view.bounds.width, height: 0), withHorizontalFittingPriority: UILayoutPriorityRequired, verticalFittingPriority: UILayoutPriorityFittingSizeLevel).height
         }
@@ -121,7 +121,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
 
     // MARK: -
 
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
         guard let paletteViewController = paletteViewController else { return }
@@ -131,7 +131,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         }
     }
 
-    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+    override public func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
         super.willTransition(to: newCollection, with: coordinator)
 
         guard let paletteViewController = paletteViewController else { return }
@@ -141,7 +141,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         paletteViewController.willTransition(to: traitCollection, with: coordinator)
     }
 
-    override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
+    override public func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
         super.preferredContentSizeDidChange(forChildContentContainer: container)
 
         guard container === paletteViewController else { return }
@@ -149,7 +149,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
         setNeedsUpdateEdgeInsets(forChild: selectedViewController, animated: true)
     }
 
-    override func systemLayoutFittingSizeDidChange(forChildContentContainer container: UIContentContainer) {
+    override public func systemLayoutFittingSizeDidChange(forChildContentContainer container: UIContentContainer) {
         super.systemLayoutFittingSizeDidChange(forChildContentContainer: container)
 
         guard container === paletteViewController else { return }
@@ -159,13 +159,13 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
     // MARK: -
 
     /// The custom accessory view controller to display above the tab bar.
-    private(set) var paletteViewController: UIViewController?
+    private(set) public var paletteViewController: UIViewController?
 
     /// Attach or detach the custom accessory.
     ///
     /// If `animated` is `true`, will also reflow the content of the selected
     /// view controller.
-    func setPaletteViewController(_ newValue: UIViewController?, animated: Bool) {
+    public func setPaletteViewController(_ newValue: UIViewController?, animated: Bool) {
         let paletteTransformAtEnd: CGAffineTransform
         let completion: (Bool) -> Void
 
@@ -310,7 +310,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
 
     // MARK: - Content insets
 
-    fileprivate func insetForPalette(inChild child: UIViewController?) -> CGFloat {
+    private func insetForPalette(inChild child: UIViewController?) -> CGFloat {
         guard let child = child, child.edgesForExtendedLayout.contains(.bottom), paletteViewController != nil else {
             return 0
         }
@@ -367,7 +367,7 @@ final class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDe
 
     // MARK: - UIGestureRecognizerDelegate
 
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         guard gestureRecognizer === paletteHighlightGesture else { return false }
         return true
     }
