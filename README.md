@@ -124,6 +124,10 @@ Experiment adding an accessory to `UITabBarController`, like Now Playing in Musi
 - Detects and supports highlighting of palette background on tap
 - Supports Interface Builder, 3D Touch, and modal view controllers
 
+### [Thread with Function](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Thread%20with%20Function.playground)
+
+Spawn and join with a `pthread_t` returning a result from a Swift function, inspired by [the Swift stdlib](https://github.com/apple/swift/blob/master/stdlib/private/SwiftPrivatePthreadExtras/SwiftPrivatePthreadExtras.swift). See also [`Thread.init(block:)`](https://developer.apple.com/documentation/foundation/thread/2088561-init) from iOS 10 and up.
+
 ### [UI Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/UI%20Geometry.playground)
 
 Conveniences for using Core Graphics types in UI programming, such as retina-friendly
