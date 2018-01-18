@@ -84,7 +84,7 @@ final class FirstViewController: UIViewController {
             toggleStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             toggleStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
 
-            layoutTopContainer.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor),
+            layoutTopContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             layoutTopContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             layoutTopContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
@@ -92,7 +92,7 @@ final class FirstViewController: UIViewController {
             layoutTop.centerXAnchor.constraint(equalTo: layoutTopContainer.layoutMarginsGuide.centerXAnchor),
             layoutTop.centerYAnchor.constraint(equalTo: layoutTopContainer.layoutMarginsGuide.centerYAnchor),
 
-            bottomLayoutGuide.topAnchor.constraint(equalTo: layoutBottomContainer.bottomAnchor),
+            view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: layoutBottomContainer.bottomAnchor),
             layoutBottomContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             layoutBottomContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
@@ -234,7 +234,7 @@ final class PaletteViewController: UIViewController {
 
         let button2 = UIButton(type: .system)
         button2.translatesAutoresizingMaskIntoConstraints = false
-        button2.setTitle("Increase height", for: .normal)
+        button2.setTitle("Decrease height", for: .normal)
         button2.addTarget(self, action: #selector(shrink), for: .primaryActionTriggered)
         view.addArrangedSubview(button2)
 
@@ -308,9 +308,7 @@ final class PaletteViewController: UIViewController {
 
 }
 
-let tvc = AccessoryTabBarController()
-tvc.viewControllers = [
+PlaygroundPage.current.liveView = AccessoryTabBarController(viewControllers: [
     UINavigationController(rootViewController: FirstViewController()),
     UINavigationController(rootViewController: SecondViewController())
-]
-PlaygroundPage.current.liveView = tvc
+])

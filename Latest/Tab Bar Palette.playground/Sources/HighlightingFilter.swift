@@ -50,10 +50,26 @@ extension HighlightingFilter {
 
 }
 
+/// Based off how a custom `UIButton` darkens its background image.
+struct DarkerHighlight: HighlightingFilter {
+
+    unowned let containerView: UIView
+    var highlightView: UIView?
+
+    init(in containerView: UIView) {
+        self.containerView = containerView
+    }
+
+    static func makeHighlightView() -> UIView {
+        return BackgroundBlendingView(filters: (.sourceAtop, #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0.46)))
+    }
+
+}
+
 /// Based off how a custom `UIAlertController` lightens its buttons.
 struct VibrantLighterHighlight: HighlightingFilter {
 
-    let containerView: UIView
+    unowned let containerView: UIView
     var highlightView: UIView?
 
     init(in containerView: UIView) {
@@ -65,3 +81,4 @@ struct VibrantLighterHighlight: HighlightingFilter {
     }
 
 }
+

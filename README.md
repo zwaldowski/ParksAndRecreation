@@ -115,6 +115,19 @@ Emulating the calculation of [`UIView.readableContentGuide`](https://developer.a
 
 Simple Swift bridging for [`NSRegularExpression`](https://developer.apple.com/library/mac/documentation/Foundation/Reference/NSRegularExpression_Class/), as well as general patterns to go from `String.UTF16View` and `Range<String.UTF16Index>` to `NSString` and `NSRange`.
 
+### [Floating Now Playing Bar](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Tab%20Bar%20Palette.playground)
+
+Experiment adding an accessory to `UITabBarController`, like Now Playing in Music.​app.
+
+![Tab bar palette gallery](https://raw.githubusercontent.com/zwaldowski/ParksAndRecreation/master/Media/2018-01-17%20Tab%20Bar%20Palette.png)
+
+- Drop-in UITabBarController with a `paletteViewController` property
+- Palette is forwarded appearance (i.e., `viewWillAppear`) and trait collection events
+- Palette supports sizing through Auto Layout and `preferredContentSize` and animating changes to those
+- Can animate in, out, and between palette changes
+- Detects and supports highlighting of palette background on tap
+- Supports Interface Builder, 3D Touch, and modal view controllers
+
 ### [UI Geometry](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/UI%20Geometry.playground)
 
 Conveniences for using Core Graphics types in UI programming, such as retina-friendly
@@ -130,19 +143,6 @@ A simple bridge to bridges concrete value types into `NSCoding`.
 ### [View Recursion](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ViewRecursion.playground)
 
 Showing off the simple power of Swift iterators by performing breadth-first travel through the trees created by `UIView`, `UIViewController`, and `CALayer`.
-
-### [Floating Now Playing Bar](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/WeAllFloat.playground)
-
-Experiment adding an accessory to `UITabBarController`, like Now Playing in Music.​app.
-
-#### Features
-
-- Drop-in UITabBarController with a `paletteViewController` property
-- Palette is forwarded appearance (i.e., `viewWillAppear`) and trait collection events
-- Palette supports sizing through Auto Layout and `preferredContentSize` and animating changes to those
-- Can animate in, out, and between palette changes
-- Detects and supports highlighting of palette background on tap
-- Supports Interface Builder, 3D Touch, and modal view controllers
 
 ### Swift 2 only
 
