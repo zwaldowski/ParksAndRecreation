@@ -36,12 +36,9 @@ Based on a technique used in the iOS 10 Music app, subclasses of `UICollectionVi
 
 Mathematical operators and idiomatic bridging for Core Graphics types.
 
-### Keyboard Layout Guide
+### [Keyboard Layout Guide](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Keyboard%20Layout%20Guide)
 
-* [Swift 2](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/KeyboardLayoutGuide)
-* [Swift 3](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/KeyboardLayoutGuide)
-
-An extension on `UIViewController` providing a `keyboardLayoutGuide` property. The layout guide normally mirrors the `topLayoutGuide` and `bottomLayoutGuide`, but automatically resizes to avoid the keyboard.
+An extension on `UIViewController` providing a `keyboardLayoutGuide` property. The layout guide normally mirrors the safe area, but automatically shrinks to avoid the keyboard. It also allows emulating the automatic content keyboard insets applied to `UICollectionViewController` and `UITableViewController`. It avoids the pitfalls of most keyboard avoidance implementations, like correctly syncing animations.
 
 The Swift 3 version requires iOS 9.0.
 
