@@ -14,10 +14,6 @@ A simple class for using Unicode to encircle some characters or single-digit num
 
 ![Badge gallery](https://raw.githubusercontent.com/zwaldowski/ParksAndRecreation/master/Media/2018-01-17%20Badge%20Formatter.png)
 
-### [ConcretePlusProtocol](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ConcretePlusProtocol.playground)
-
-If you're hurting for Objective-C's `MyClassType<SomeProtocolType> *`, try this on for size.
-
 ### [Custom Truncation](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/CustomTruncation.playground)
 
 Use [TextKit](https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/CustomTextProcessing/CustomTextProcessing.html) to perform custom truncation with high performance. Also an example of creating building a drop-in `UILabel` backed by TextKit.
@@ -133,18 +129,28 @@ Experiment adding an accessory to `UITabBarController`, like Now Playing in Musi
 Conveniences for using Core Graphics types in UI programming, such as retina-friendly
 rounding and equation operators that account for floating point inaccuracy.
 
-### Value Coding
+### [View Recursion](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ViewRecursion.playground)
+
+Showing off the simple power of Swift iterators by performing breadth-first travel through the trees created by `UIView`, `UIViewController`, and `CALayer`.
+
+### Obsoleted in Swift 4
+
+#### [ConcretePlusProtocol](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ConcretePlusProtocol.playground)
+
+If you're hurting for Objective-C's `MyClassType<SomeProtocolType> *`, try this on for size.
+
+Obsoleted in Swift 4 by `MyClass & SomeProtocol` syntax.
+
+#### Value Coding
 
 * [Swift 2](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ValueCodable.playground)
 * [Swift 3](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/ValueCodable.playground)
 
 A simple bridge to bridges concrete value types into `NSCoding`.
 
-### [View Recursion](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ViewRecursion.playground)
+Obsoleted in Swift 4 by `Codable`.
 
-Showing off the simple power of Swift iterators by performing breadth-first travel through the trees created by `UIView`, `UIViewController`, and `CALayer`.
-
-### Swift 2 only
+### Obsoleted in Swift 3
 
 #### [BetterCoreDataInit](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/BetterCoreDataInit.playground)
 
