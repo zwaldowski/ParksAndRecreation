@@ -78,7 +78,7 @@ And in your `Localizable.strings`, just like in Cocoa:
 All placeholders should be `%@` on the end of the key, and be represented
 positionally, i.e., with `%1$@`, `%2$@`, and so on.
 
-### [Target-Action Notifier](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/Notifier.playground)
+### [Target-Action Notifier](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Notifier.playground)
 
 A helper for performing type-safe multicast callbacks. The result is a lot like
 using `UIControl`, but for weakly held objects and without unsafe selectors.

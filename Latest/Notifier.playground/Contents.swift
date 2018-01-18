@@ -7,7 +7,7 @@ class MyClass {
 }
 
 enum WookieeEvent {
-    case Growl
+    case growl
 }
 
 // MARK: -
@@ -16,8 +16,8 @@ let instance = MyClass()
 
 var notifier = Notifier<WookieeEvent, Int>()
 
-notifier.addObserver(instance, forEvent: .Growl, body: MyClass.respondToEvent)
+notifier.addObserver(instance, for: .growl, handler: MyClass.respondToEvent)
 
-notifier.sendNotificationsForEvent(.Growl, info: 42)
+notifier.sendNotifications(for: .growl, info: 42)
 
 // Expand the console log to see the dispatched event.
