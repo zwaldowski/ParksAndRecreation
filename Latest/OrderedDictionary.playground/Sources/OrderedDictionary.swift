@@ -1,59 +1,9 @@
-public struct OrderedDictionarySlice<Key: Hashable, Value>: RandomAccessCollection {
-    
-    private typealias Base = OrderedDictionary<Key, Value>
-    
-    private let keys: ArraySlice<Key>
-    private let elements: Base.Hash
-    
-    fileprivate init(keys: ArraySlice<Key>, elements: Base.Hash) {
-        self.keys = keys
-        self.elements = elements
-    }
-    
-    /// The element type: a tuple containing an individual key-value pair.
-    public typealias Element = (key: Key, value: Value)
-    
-    public typealias Indices = CountableRange<Int>
-    
-    public func makeIterator() -> LazyMapIterator<IndexingIterator<ArraySlice<Key>>, Element> {
-        return keys.lazy.map { ($0, self.elements[$0]!.1) }.makeIterator()
-    }
-    
-    public var startIndex: Int {
-        return keys.startIndex
-    }
-    
-    public var endIndex: Int {
-        return keys.endIndex
-    }
-    
-    public var count: Int {
-        return keys.count
-    }
-    
-    fileprivate func checkIndex(_ index: Int) {
-        guard case keys.indices = index else {
-            preconditionFailure("index out of bounds")
-        }
-    }
-    
-    public subscript(position: Int) -> Element {
-        checkIndex(position)
-        let key = keys[position]
-        let value = elements[key]!.1
-        return (key, value)
-    }
-    
-    public subscript(range: Range<Int>) -> OrderedDictionarySlice<Key, Value> {
-        return OrderedDictionarySlice(keys: keys[range], elements: elements)
-    }
-    
-}
-
+/// An ordered collection of key-value pairs with hash-based mapping from
+/// `Key` to `Value`.
 public struct OrderedDictionary<Key: Hashable, Value> {
-    
-    fileprivate typealias Hash = Dictionary<Key, (Int, Value)>
-    
+    /// A key-value pair
+    public typealias Element = (key: Key, value: Value)
+
     /// A collection containing just the keys of the dictionary.
     ///
     /// When iterated over, keys appear in this collection in the same order as they
@@ -68,83 +18,69 @@ public struct OrderedDictionary<Key: Hashable, Value> {
     ///     // Prints "GH"
     ///     // Prints "JP"
     fileprivate(set) public var keys: [Key]
-    fileprivate var elements: Hash
-    
-    fileprivate init(keys: [Key], elements: Hash) {
-        self.keys = keys
-        self.elements = elements
-    }
-    
+
+    fileprivate var elements: [Key: Value]
+
     /// Create an empty instance.
     public init() {
-        self.init(keys: [], elements: [:])
+        self.keys = []
+        self.elements = [:]
     }
-    
+
     /// Creates an instance with at least `minimumCapacity` worth of
     /// storage.
     ///
     /// Use this initializer to avoid intermediate reallocations when you know
     /// how many key-value pairs you are adding to the dictionary.
     public init(minimumCapacity: Int) {
-        self.init(keys: [], elements: Dictionary(minimumCapacity: minimumCapacity))
+        self.keys = []
+        self.elements = Dictionary(minimumCapacity: minimumCapacity)
         keys.reserveCapacity(minimumCapacity)
     }
-    
+
 }
 
 extension OrderedDictionary: RandomAccessCollection {
-    
-    /// The element type: a tuple containing an individual key-value pair.
-    public typealias Element = (key: Key, value: Value)
-    
+
     public typealias Indices = CountableRange<Int>
-    
+
     public func makeIterator() -> LazyMapIterator<IndexingIterator<[Key]>, Element> {
-        return keys.lazy.map { ($0, self.elements[$0]!.1) }.makeIterator()
+        return keys.lazy.map { [elements] in ($0, elements[$0]!) }.makeIterator()
     }
-    
+
     public var startIndex: Int {
         return keys.startIndex
     }
-    
+
     public var endIndex: Int {
         return keys.endIndex
     }
-    
+
     public var count: Int {
         return elements.count
     }
-    
-    fileprivate func checkIndex(_ index: Int) {
-        guard case keys.indices = index else {
-            preconditionFailure("index out of bounds")
-        }
-    }
-    
+
     public subscript(position: Int) -> Element {
         get {
-            checkIndex(position)
-            let key = keys[position]
-            let value = elements[key]!.1
-            return (key, value)
+            guard case keys.indices = position, let value = elements[keys[position]] else {
+                preconditionFailure("index out of bounds")
+            }
+            return (keys[position], value)
         }
         set {
-            checkIndex(position)
-            var oldKey = newValue.0
-            swap(&keys[position], &oldKey)
-            _ = elements.removeValue(forKey: oldKey)
-            elements[newValue.0] = (position, newValue.1)
+            guard case keys.indices = position, elements.removeValue(forKey: keys[position]) != nil else {
+                preconditionFailure("index out of bounds")
+            }
+
+            keys[position] = newValue.0
+            elements[newValue.0] = newValue.1
         }
     }
-    
-    public subscript(range: Range<Int>) -> OrderedDictionarySlice<Key, Value> {
-        return OrderedDictionarySlice(keys: keys[range], elements: elements)
-    }
-    
+
 }
 
 extension OrderedDictionary {
-    
+
     /// A collection containing just the values of the dictionary.
     ///
     /// When iterated over, values appear in this collection in the same order as they
@@ -160,17 +96,17 @@ extension OrderedDictionary {
     ///     // Prints "Japan"
     ///     // Prints "Ghana"
     public var values: LazyMapCollection<[Key], Value> {
-        return keys.lazy.map { self[$0]! }
+        return keys.lazy.map { [elements] in elements[$0]! }
     }
-    
+
     /// Returns the `Index` for the given key.
     /// - parameter key: hash value for which to look for an index
     /// - returns: An index, or `nil` if the key is not present in the ordered
     ///   dictionary.
     public func index(forKey key: Key) -> Int? {
-        return elements[key]?.0
+        return keys.index { $0 == key }
     }
-    
+
     /// Accesses the value associated with the given key for reading and writing.
     ///
     /// This *key-based* subscript returns the value for the given key if the key
@@ -217,18 +153,19 @@ extension OrderedDictionary {
     ///   otherwise, `nil`.
     public subscript(key: Key) -> Value? {
         get {
-            return elements[key]?.1
+            return elements[key]
         }
         set {
-            guard let newValue = newValue else {
+            if let newValue = newValue {
+                if elements.updateValue(newValue, forKey: key) == nil {
+                    keys.append(key)
+                }
+            } else {
                 _ = removeValue(forKey: key)
-                return
             }
-            
-            _ = updateValue(newValue, forKey: key)
         }
     }
-    
+
     /// Updates the value stored in the dictionary for the given key, or adds a
     /// new key-value pair if the key does not exist.
     ///
@@ -263,92 +200,106 @@ extension OrderedDictionary {
     /// - Returns: The value that was replaced, or `nil` if a new key-value pair
     ///   was added.
     public mutating func updateValue(_ value: Value, forKey key: Key) -> Value? {
-        if let oldElement = elements.removeValue(forKey: key) {
-            elements[key] = (oldElement.0, value)
-            return oldElement.1
-        } else {
-            elements[key] = (keys.endIndex, value)
-            keys.append(key)
-            return nil
+        if let oldValue = elements.updateValue(value, forKey: key) {
+            return oldValue
         }
+
+        keys.append(key)
+        return nil
     }
-    
-    /// Removes the given key and its associated value from the dictionary.
-    ///
-    /// If the key is found in the dictionary, this method returns the key's
-    /// associated value. On removal, this method invalidates all indices with
-    /// respect to the dictionary.
-    ///
-    ///     var hues = ["Heliotrope": 296, "Coral": 16, "Aquamarine": 156]
-    ///     if let value = hues.removeValue(forKey: "Coral") {
-    ///         print("The value \(value) was removed.")
-    ///     }
-    ///     // Prints "The value 16 was removed."
-    ///
-    /// If the key isn't found in the dictionary, `removeValue(forKey:)` returns
-    /// `nil`.
-    ///
-    ///     if let value = hues.removeValueForKey("Cerise") {
-    ///         print("The value \(value) was removed.")
-    ///     } else {
-    ///         print("No value found for that key.")
-    ///     }
-    ///     // Prints "No value found for that key.""
-    ///
-    /// - Parameter key: The key to remove along with its associated value.
-    /// - Returns: The value that was removed, or `nil` if the key was not
-    ///   present in the dictionary.
-    ///
-    /// - Complexity: O(*n*), where *n* is the number of key-value pairs in the
-    ///   dictionary.
+
+    /// Remove a given key and its associated value from the dictionary.
+    /// - parameter key: Key for which to look for a value to remove
+    /// - returns: The value that was removed, or `nil` if the key was not
+    ///   present in the ordered dictionary.
     public mutating func removeValue(forKey key: Key) -> Value? {
-        guard let result = elements.removeValue(forKey: key) else { return nil }
-        keys.remove(at: result.0)
-        return result.1
+        guard let ret = elements.removeValue(forKey: key), let index = index(forKey: key) else { return nil }
+        keys.remove(at: index)
+        return ret
     }
-    
+
 }
 
 extension OrderedDictionary {
-    
-    /// Removes all key-value pairs from the dictionary.
+
+    /// Inserts a new element into the collection at the specified position.
     ///
-    /// Calling this method invalidates all indices with respect to the
-    /// dictionary.
+    /// The new element is inserted before the element currently at the
+    /// specified index. If you pass the collection's `endIndex` property as
+    /// the `index` parameter, the new element is appended to the
+    /// collection.
     ///
-    /// - Parameter keepCapacity: Whether the dictionary should keep its
-    ///   underlying storage. If you pass `true`, the operation preserves the
-    ///   storage capacity that the collection has, otherwise the underlying
-    ///   storage is released.  The default is `false`.
+    ///     var numbers = [1, 2, 3, 4, 5]
+    ///     numbers.insert(100, at: 3)
+    ///     numbers.insert(200, at: numbers.endIndex)
     ///
-    /// - Complexity: O(*n*), where *n* is the number of key-value pairs in the
-    ///   dictionary.
+    ///     print(numbers)
+    ///     // Prints "[1, 2, 3, 100, 4, 5, 200]"
+    ///
+    /// Calling this method may invalidate any existing indices for use with this
+    /// collection.
+    ///
+    /// - Parameter newElement: The new element to insert into the collection.
+    /// - Parameter i: The position at which to insert the new element.
+    ///   `index` must be a valid index into the collection.
+    ///
+    /// - Complexity: O(*n*), where *n* is the length of the collection.
+    public mutating func insert(_ newElement: Element, at i: Int) {
+        guard elements.updateValue(newElement.value, forKey: newElement.key) == nil else { return }
+        keys.insert(newElement.key, at: i)
+    }
+
+    /// Removes and returns the element at the specified position.
+    ///
+    /// All the elements following the specified position are moved to close the
+    /// gap. This example removes the middle element from an array of
+    /// measurements.
+    ///
+    ///     var measurements = [1.2, 1.5, 2.9, 1.2, 1.6]
+    ///     let removed = measurements.remove(at: 2)
+    ///     print(measurements)
+    ///     // Prints "[1.2, 1.5, 1.2, 1.6]"
+    ///
+    /// Calling this method may invalidate any existing indices for use with this
+    /// collection.
+    ///
+    /// - Parameter i: The position of the element to remove. `index` must be
+    ///   a valid index of the collection that is not equal to the collection's
+    ///   end index.
+    /// - Returns: The removed element.
+    ///
+    /// - Complexity: O(*n*), where *n* is the length of the collection.
+    public mutating func remove(at i: Int) -> Element {
+        let key = keys.remove(at: i)
+        let value = elements.removeValue(forKey: key)
+
+        // swiftlint:disable:next force_unwrapping
+        return (key, value!)
+    }
+
+    /// Remove all elements.
+    /// - parameter keepCapacity: If `true`, is a non-binding request to
+    ///   avoid releasing storage, which can be a useful optimization
+    ///   when `self` is going to be grown again.
     public mutating func removeAll(keepingCapacity keepCapacity: Bool = false) {
         keys.removeAll(keepingCapacity: keepCapacity)
         elements.removeAll(keepingCapacity: keepCapacity)
     }
-    
+
 }
 
 extension OrderedDictionary: ExpressibleByDictionaryLiteral {
-    
-    /// Create an instanace with `list`.
-    ///
-    /// The order of elements in the dictionary literal is preserved.
-    ///
-    /// - parameter list: An ordered list of key/value pairs.
+
     public init(dictionaryLiteral list: (Key, Value)...) {
-        self.init(keys: list.map { $0.0 }, elements: Hash(minimumCapacity: list.count))
-        for (index, (key, value)) in list.enumerated() {
-            elements[key] = (index, value)
-        }
+        self.keys = list.map { $0.0 }
+        self.elements = Dictionary(list, uniquingKeysWith: { $1 })
     }
-    
+
 }
 
 extension OrderedDictionary: CustomStringConvertible, CustomDebugStringConvertible, CustomReflectable {
-    
-    fileprivate func makeDescription(debug: Bool) -> String {
+
+    private func makeDescription(debug: Bool) -> String {
         guard !isEmpty else { return "[:]" }
         var result = debug ? "OrderedDictionary([" : "["
         var first = true
@@ -358,15 +309,15 @@ extension OrderedDictionary: CustomStringConvertible, CustomDebugStringConvertib
             } else {
                 result += ", "
             }
-            
+
             if debug {
                 debugPrint(k, terminator: "", to: &result)
             } else {
                 print(k, terminator: "", to: &result)
             }
-            
+
             result += ": "
-            
+
             if debug {
                 debugPrint(v, terminator: "", to: &result)
             } else {
@@ -376,23 +327,17 @@ extension OrderedDictionary: CustomStringConvertible, CustomDebugStringConvertib
         result += debug ? "])" : "]"
         return result
     }
-    
-    /// A textual representation of `self`.
+
     public var description: String {
         return makeDescription(debug: false)
     }
-    
-    /// A textual representation of `self`, suitable for debugging.
+
     public var debugDescription: String {
         return makeDescription(debug: true)
     }
-    
-    /// Return the `Mirror` for `self`.
-    ///
-    /// - note: The `Mirror` will be unaffected by mutations of `self`.
-    /// - returns: An introspection `Mirror`.
-    public var customMirror: Mirror {
-        return Mirror(self, unlabeledChildren: self, displayStyle: .dictionary)
-    }
-}
 
+    public var customMirror: Mirror {
+        return Mirror(self, unlabeledChildren: elements, displayStyle: .dictionary)
+    }
+
+}

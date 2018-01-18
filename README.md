@@ -85,12 +85,9 @@ using `UIControl`, but for weakly held objects and without unsafe selectors.
 
 Heavily inspired by [this blog post](http://oleb.net/blog/2014/07/swift-instance-methods-curried-functions/) from @ole.
 
-### Ordered Dictionary
+### [Ordered Dictionary](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Ordered%20Dictionary.playground)
 
-* [Swift 2](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/OrderedDictionary.playground)
-* [Swift 3](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/OrderedDictionary.playground)
-
-A simple glueing together of `Swift.Dictionary` and `Swift.String` into an ordered, hashed data structure. Useful if your keys are indeed already `Hashable`, but doesn't have great performance; insertion and removal tend towards the worst of both structures. If you have any alternative, prefer something [B-Tree based](https://github.com/lorentey/BTree/blob/master/Sources/Map.swift) instead.
+A simple glueing-together of `Dictionary` and `Array` into an ordered, hashed data structure. Useful if your keys are indeed already `Hashable`, but doesn't have great performance; insertion and removal tend towards the worst of both structures. If you have any alternative, prefer something [B-Tree based](https://github.com/lorentey/BTree) instead.
 
 ### [Custom Size Classes](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/Overrides)
 
