@@ -39,15 +39,6 @@ An extension on `UIViewController` providing a `keyboardLayoutGuide` property. T
 
 The Swift 3 version requires iOS 9.0.
 
-### [String Tokenization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/LineParagraphs.playground)
-
-Line, paragraph, sentence, and word views for `Swift.String`, providing alternatives to `String.enumerateSubstringsInRange(_:options:_:)`.
-
-```swift
-Array(string.lines)            // -> [Range<String.Index>]
-Array(string.lines.substrings) // -> [String]
-```
-
 ### [String Localization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/Localize.playground)
 
 Formatted localization using Swift string formatting. Introduces `localize` with
@@ -100,6 +91,14 @@ Emulating the calculation of [`UIView.readableContentGuide`](https://developer.a
 ### [Regular Expressions](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/RegularExpression.playground)
 
 Simple Swift bridging for [`NSRegularExpression`](https://developer.apple.com/library/mac/documentation/Foundation/Reference/NSRegularExpression_Class/), as well as general patterns to go from `String.UTF16View` and `Range<String.UTF16Index>` to `NSString` and `NSRange`.
+
+### [String Views](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/String%20Views.playground)
+
+Line, paragraph, sentence, and word views for `Swift.String`, providing a more idiomatic take on `StringProtocol.getLineStart(_:end:contentsEnd:for:)` and `StringProtocol.getParagraphStart(_:end:contentsEnd:for:)` as Swift collections.
+
+```swift
+Array(string.lines) // -> [Substring]
+```
 
 ### [Floating Now Playing Bar](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Tab%20Bar%20Palette.playground)
 
