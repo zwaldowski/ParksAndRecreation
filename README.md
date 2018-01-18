@@ -3,16 +3,15 @@
 Various Swift playgrounds, for fun and for profit.
 
 ## Index
-
-### [AnyCollectionSlice](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/AnyCollectionSlice.playground)
-
-Derived from @krzyzanowskim's [blog post](http://blog.krzyzanowskim.com/2015/10/24/chunksequence-have-cake-and-eat-it/): use protocol extension to split any collection into a group of slices. Think `flatten()`, but in reverse.
-
 ### [Badge Formatter](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Badge%20Formatter.playground)
 
 A simple class for using Unicode to encircle some characters or single-digit numbers in the iOS system font, inspired by [this tweet](https://twitter.com/Tricertops/status/952265724789129216). Includes a gallery live view for demonstration.
 
 ![Badge gallery](https://raw.githubusercontent.com/zwaldowski/ParksAndRecreation/master/Media/2018-01-17%20Badge%20Formatter.png)
+
+### [Chunk Sequence](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Chunk%20Sequence.playground)
+
+Derived from @krzyzanowskim's [blog post](http://blog.krzyzanowskim.com/2015/10/24/chunksequence-have-cake-and-eat-it/): use a protocol extension to split any collection into a group of slices. Think `flatten()`, but in reverse.
 
 ### [Custom Truncation](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/CustomTruncation.playground)
 
