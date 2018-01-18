@@ -3,7 +3,7 @@ import PlaygroundSupport
 
 PlaygroundPage.current.needsIndefiniteExecution = true
 
-let debounce = Debounce<Int> {
+let debounce = SimpleDebounce<Int> {
     print("Got value \($0)!")
 }
 

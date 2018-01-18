@@ -17,10 +17,7 @@ Derived from @krzyzanowskim's [blog post](http://blog.krzyzanowskim.com/2015/10/
 
 Use [TextKit](https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/CustomTextProcessing/CustomTextProcessing.html) to perform custom truncation with high performance. Also an example of creating building a drop-in `UILabel` backed by TextKit.
 
-### Debounce
-
-* [Swift 2](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/Debounce.playground)
-* [Swift 3](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/Debounce.playground)
+### [Debounce](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Debounce.playground)
 
 Use [`DispatchSource`](https://developer.apple.com/reference/dispatch/dispatchsource) to coalesce calls that shouldn't be called more than once per runloop iteration, like UI reconfiguration.
 
