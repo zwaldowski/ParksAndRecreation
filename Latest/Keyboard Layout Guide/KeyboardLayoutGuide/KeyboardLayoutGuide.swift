@@ -187,7 +187,8 @@ private struct KeyboardInfo {
     }
 
     func overlap(in view: UIView) -> CGFloat {
-        guard let endFrame = userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect, !view.isEffectivelyInPopover, !view.isEffectivelyDisappearing else { return 0 }
+        guard let endFrame = userInfo?[UIKeyboardFrameEndUserInfoKey] as? CGRect,
+            view.canBeObscuredByKeyboard else { return 0 }
 
         let intersection = view.convert(endFrame, from: UIScreen.main.coordinateSpace).intersection(view.bounds)
         guard !intersection.isNull, intersection.maxY == view.bounds.maxY else { return 0 }

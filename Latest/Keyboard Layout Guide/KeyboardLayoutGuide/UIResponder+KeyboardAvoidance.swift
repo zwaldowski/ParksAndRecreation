@@ -19,14 +19,26 @@ extension UIResponder {
         return nil
     }
 
-    var isEffectivelyInPopover: Bool {
-        var presenter = findNextResponder(of: UIViewController.self)
-        while let current = presenter {
-            if current.presentationController is UIPopoverPresentationController { return true }
-            if current.presentationController?.shouldPresentInFullscreen == true { return false }
-            presenter = current.presentingViewController
+    var canBeObscuredByKeyboard: Bool {
+        // Traverse `presentingViewController`s looking for an active presenter
+        // that already handles the keyboard.
+        var next = findNextResponder(of: UIViewController.self)
+        while let current = next {
+            if current.presentingViewController == nil {
+                // `modalPresentationStyle` doesn't matter, we're the root
+                break
+            } else if current.modalPresentationStyle == .popover || current is UITableViewController || next is UICollectionViewController {
+                // Popovers handle keyboard avoidance in their totality.
+                return false
+            } else if current.modalPresentationStyle == .custom, current.presentationController?.shouldPresentInFullscreen == true {
+                // full-screen presentation, we're equivalent to the root
+                break
+            } else {
+                // no info at this level, move to next step
+                next = current.presentingViewController
+            }
         }
-        return false
+        return !isEffectivelyDisappearing
     }
 
     var isEffectivelyDisappearing: Bool {
