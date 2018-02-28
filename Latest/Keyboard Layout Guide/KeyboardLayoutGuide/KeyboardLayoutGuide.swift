@@ -103,8 +103,8 @@ public final class KeyboardLayoutGuide: UILayoutGuide {
             UIView.performWithoutAnimation(view.layoutIfNeeded)
 
             let animator = info.makeAnimator()
-            animator.addCompletion { _ in
-                self.currentAnimator = nil
+            animator.addCompletion { [weak self] _ in
+                self?.currentAnimator = nil
             }
             self.currentAnimator = animator
             return animator
@@ -144,7 +144,8 @@ extension UIViewController {
     private static var keyboardLayoutGuideKey = false
 
     /// For unit testing purposes only.
-    func makeKeyboardLayoutGuide(notificationCenter: NotificationCenter) -> KeyboardLayoutGuide {
+    @nonobjc
+    internal func makeKeyboardLayoutGuide(notificationCenter: NotificationCenter) -> KeyboardLayoutGuide {
         assert(isViewLoaded, "This layout guide should not be accessed before the view is loaded.")
 
         let guide = KeyboardLayoutGuide(notificationCenter: notificationCenter)
@@ -162,7 +163,7 @@ extension UIViewController {
     /// animation.
     ///
     /// - seealso: KeyboardLayoutGuide
-    public var keyboardLayoutGuide: KeyboardLayoutGuide {
+    @nonobjc public var keyboardLayoutGuide: KeyboardLayoutGuide {
         if let guide = objc_getAssociatedObject(self, &UIViewController.keyboardLayoutGuideKey) as? KeyboardLayoutGuide {
             return guide
         }
@@ -178,10 +179,7 @@ extension UIViewController {
 
 private struct KeyboardInfo {
 
-    private let userInfo: [AnyHashable: Any]?
-    init(userInfo: [AnyHashable: Any]?) {
-        self.userInfo = userInfo
-    }
+    let userInfo: [AnyHashable: Any]?
 
     func makeAnimator() -> UIViewPropertyAnimator {
         let duration = (userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? TimeInterval) ?? 0.25
