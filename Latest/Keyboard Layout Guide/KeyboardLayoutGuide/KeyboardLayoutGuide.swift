@@ -54,24 +54,29 @@ public final class KeyboardLayoutGuide: UILayoutGuide {
 
     // MARK: Actions
 
-    private var keyboardBottomConstraint: NSLayoutConstraint!
+    private var keyboardBottomConstraint: NSLayoutConstraint?
     private var lastScrollViewInsetDelta: CGFloat = 0
     private var currentAnimator: UIViewPropertyAnimator?
 
-    fileprivate func activate(in view: UIView) {
-        view.addLayoutGuide(self)
+    override public var owningView: UIView? {
+        didSet {
+            guard owningView !== oldValue else { return }
+            keyboardBottomConstraint?.isActive = false
+            keyboardBottomConstraint = nil
 
-        NSLayoutConstraint.activate([
-            leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            view.layoutMarginsGuide.trailingAnchor.constraint(equalTo: trailingAnchor),
-            topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            view.safeAreaLayoutGuide.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor), {
-                let constraint = view.bottomAnchor.constraint(equalTo: bottomAnchor)
-                constraint.priority = UILayoutPriority(rawValue: 998)
-                self.keyboardBottomConstraint = constraint
-                return constraint
-            }()
-        ])
+            guard let view = owningView else { return }
+            NSLayoutConstraint.activate([
+                leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                view.safeAreaLayoutGuide.trailingAnchor.constraint(equalTo: trailingAnchor),
+                topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                view.safeAreaLayoutGuide.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor), {
+                    let constraint = view.bottomAnchor.constraint(equalTo: bottomAnchor)
+                    constraint.priority = UILayoutPriority(rawValue: 999.5)
+                    self.keyboardBottomConstraint = constraint
+                    return constraint
+                }()
+            ])
+        }
     }
 
     private func update(for info: KeyboardInfo, in view: UIView, animatingWith animator: UIViewPropertyAnimator?) {
@@ -143,7 +148,7 @@ extension UIViewController {
         assert(isViewLoaded, "This layout guide should not be accessed before the view is loaded.")
 
         let guide = KeyboardLayoutGuide(notificationCenter: notificationCenter)
-        guide.activate(in: view)
+        view.addLayoutGuide(guide)
         return guide
     }
 
