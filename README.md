@@ -3,6 +3,13 @@
 Various Swift playgrounds, for fun and for profit.
 
 ## Index
+
+### [Asynchronous Operations](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Asynchronous%Operations.playground)
+
+Base classes for tracking work inside `OperationQueue` that takes place outside of the queue, without causing a thread to hang by waiting. Includes an `Operation` for wrapping `URLSessionTask`.
+
+Inspired by and lovingly nerd-sniped by [@jaredsinclair](https://github.com/jaredsinclair).
+
 ### [Badge Formatter](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Badge%20Formatter.playground)
 
 A simple class for using Unicode to encircle some characters or single-digit numbers in the iOS system font, inspired by [this tweet](https://twitter.com/Tricertops/status/952265724789129216). Includes a gallery live view for demonstration.
