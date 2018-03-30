@@ -141,10 +141,7 @@ If you're hurting for Objective-C's `MyClassType<SomeProtocolType> *`, try this 
 
 Obsoleted in Swift 4 by `MyClass & SomeProtocol` syntax.
 
-#### Value Coding
-
-* [Swift 2](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ValueCodable.playground)
-* [Swift 3](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-3/ValueCodable.playground)
+#### [Value Coding](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/ValueCodable.playground)
 
 A simple bridge to bridges concrete value types into `NSCoding`.
 

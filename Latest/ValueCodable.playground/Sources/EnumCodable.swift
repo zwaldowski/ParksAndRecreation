@@ -1,6 +1,7 @@
 import Foundation
 
-extension RawRepresentable where RawValue: ValueCodable {
+@available(swift, obsoleted: 4, message: "There is a better way now.")
+extension RawRepresentable where Self: ValueCodable, RawValue: ValueCodable {
 
     /// Encodes `self` using a given archiver.
     public func encode(with coder: NSCoder) {
@@ -15,17 +16,18 @@ extension RawRepresentable where RawValue: ValueCodable {
 
 }
 
-extension RawRepresentable where RawValue: _ObjectiveCBridgeable, RawValue._ObjectiveCType: NSCoding, RawValue._ObjectiveCType: NSObject {
+@available(swift, obsoleted: 4, message: "There is a better way now.")
+extension RawRepresentable where Self: ValueCodable, RawValue: _ObjectiveCBridgeable, RawValue._ObjectiveCType: NSCoding {
 
     /// Encodes `self` using a given archiver.
     public func encode(with coder: NSCoder) {
-        coder.encode(rawValue as AnyObject)
+        coder.encode(rawValue._bridgeToObjectiveC())
     }
 
     /// Creates an instance from from data in a given unarchiver.
     public init?(coder: NSCoder) {
-        guard let raw = coder.decodeValue(of: RawValue.self) else { return nil }
+        guard let raw = coder.decodeObject() as? RawValue else { return nil }
         self.init(rawValue: raw)
     }
-    
+
 }

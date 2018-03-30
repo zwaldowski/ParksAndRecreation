@@ -48,22 +48,22 @@ extension ColorChoice: ValueCodable, Equatable {
         case .blue:
             self = .blue
         case .other:
-            guard let color = coder.decodeObject(of: Color.self, forKey: Keys.OtherColor.rawValue) else { return nil }
+            guard let color = coder.decodeValue(of: Color.self, forKey: Keys.OtherColor.rawValue) else { return nil }
             self = .other(color)
         }
     }
 
-}
-
-func ==(lhs: ColorChoice, rhs: ColorChoice) -> Bool {
-    switch (lhs, rhs) {
-    case (.red, .red), (.green, .green), (.blue, .blue):
-        return true
-    case let (.other(lhsColor), .other(rhsColor)):
-        return lhsColor == rhsColor
-    default:
-        return false
+    static func ==(lhs: ColorChoice, rhs: ColorChoice) -> Bool {
+        switch (lhs, rhs) {
+        case (.red, .red), (.green, .green), (.blue, .blue):
+            return true
+        case let (.other(lhsColor), .other(rhsColor)):
+            return lhsColor == rhsColor
+        default:
+            return false
+        }
     }
+
 }
 
 // Automatic conformance via Int being bridged to NSNumber.
