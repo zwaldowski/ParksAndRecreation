@@ -46,6 +46,14 @@ An extension on `UIViewController` providing a `keyboardLayoutGuide` property. T
 
 The Swift 3 version requires iOS 9.0.
 
+### [Living Wallpapers](https://github.com/zwaldowski/ParksAndRecreation/tree/master/Latest/Living%20Wallpapers.playground)
+
+Create your own sun-, time-, or light/dark-based wallpaper for macOS Mojave.
+
+![Wallpaper changing from light to dark](https://raw.githubusercontent.com/zwaldowski/ParksAndRecreation/master/Media/2018-06-30%20Living%20Wallpapers.gif)
+
+Playground requires Swift 4.2 beta and macOS Mojave.
+
 ### [String Localization](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/Localize.playground)
 
 Formatted localization using Swift string formatting. Introduces `localize` with
