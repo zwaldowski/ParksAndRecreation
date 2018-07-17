@@ -1,22 +1,23 @@
 import AVFoundation
 
-/// Describes a wallpaper that changes based on the user's and angle of the
-/// sun.
-///
-/// Image 0 will be used when System Preferences > General > Appearance is set
-/// to Light.
-///
-/// Image 1 will be used when System Preferences > General > Appearance is set
-/// to Light.
-///
-/// This trigger has no other information associated with it, but it must
-/// be written to an image to distinguish it from other single-frame wallpaper.
-public struct AppearanceTrigger: WallpaperTrigger {
+/// Describes a wallpaper that changes based on the user's appearance
+/// preference.
+public struct AppearanceTrigger: DynamicDesktopTrigger {
 
     /// `apple_desktop:apr`.
     public static let tagName = "apr"
 
-    /// Creates the empty trigger.
-    public init() {}
+    /// The mapping from preference names ("Dark" and "Light") to indexes in the
+    /// image set.
+    public var appearanceIndexes: AppearanceIndexes
+
+    /// Creates the trigger with a mapping to indexes in the image set.
+    public init(lightIndex: UInt32, darkIndex: UInt32) {
+        self.appearanceIndexes = AppearanceIndexes(lightIndex: lightIndex, darkIndex: darkIndex)
+    }
+
+    private enum CodingKeys: String, Swift.CodingKey {
+        case appearanceIndexes = "ap"
+    }
 
 }

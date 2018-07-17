@@ -7,9 +7,10 @@ import PlaygroundSupport
 // Generate one trigger for every hour.
 let percentages = stride(from: 0.0, to: 1.0, by: 1 / 24)
 
-let trigger = HourTrigger(hourToIndex: percentages.enumerated().map { (arg) in
-    .image(normalizedTime: arg.element, index: UInt32(arg.offset))
-})
+var trigger = HourTrigger()
+trigger.timeToIndex = percentages.enumerated().map { (arg) in
+    HourTrigger.Mapping(normalizedTime: arg.element, index: UInt32(arg.offset))
+}
 
 let context = NSStringDrawingContext()
 let font = NSFont.boldSystemFont(ofSize: 400)

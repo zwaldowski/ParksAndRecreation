@@ -1,42 +1,24 @@
 import AVFoundation
 
-/// Describes a wallpaper that changes based on the position and angle of the
+/// Describes a wallpaper that can change based on the position and angle of the
 /// sun.
 ///
-/// Images may be provided separately for light and dark appearances. For
-/// instance, the Mojave Dynamic Desktop picture has a 13 images in the light
-/// appearance for day and night, but only 3 images in the dark apperance just
-/// for night.
+/// Still images may also be for light and dark appearances. For instance, the
+/// "Mojave (Dynamic)" image has 16 stills to be used throughout the day, and
+/// also marks the first and last stills for the "Light (Still)" and
+/// "Dark (Still)" options in System Preferences.
 ///
 /// The values for this trigger are interpreted by macOS based on your
 /// location and the season to correlate to a time of day. If you've used the
 /// Solar face on Apple Watch, this trigger models points along the curve of
 /// that face.
-public struct SolarTrigger: WallpaperTrigger {
+public struct SolarTrigger: DynamicDesktopTrigger {
 
     /// `apple_desktop:solar`.
     public static let tagName = "solar"
 
-    /// Options used to interpret an `Image`.
-    public struct ImageOptions: RawRepresentable, Codable {
-
-        public let rawValue: UInt8
-        public init(rawValue: UInt8) {
-            self.rawValue = rawValue
-        }
-
-        /// The image should be used when System Preferences > General >
-        /// Appearance is set to Light.
-        public static let useForLightAppearance = ImageOptions(rawValue: 1 << 0)
-
-        /// The image should be used when System Preferences > General >
-        /// Appearance is set to Dark.
-        public static let useForDarkAppearance = ImageOptions(rawValue: 0)
-
-    }
-
-    /// Describes an image in the image set, and when it should be used.
-    public struct Image: Codable {
+    /// Describes images in the image set, and when they should be used.
+    public struct Mapping: Codable {
 
         /// The angle up from the horizon for the sun.
         ///
@@ -55,48 +37,42 @@ public struct SolarTrigger: WallpaperTrigger {
         /// The index in the image set for this image.
         public let index: UInt32
 
-        /// Which appearance the image should be used for.
-        public let options: ImageOptions
-
-        /// Creates an image to be used when System Preferences > General >
-        /// Appearance is set to Light.
-        public static func lightImage(altitude: Double, azimuth: Double, index: UInt32) -> Image {
-            return Image(altitude: altitude, azimuth: azimuth, index: index, options: .useForLightAppearance)
-        }
-
-        /// Creates an image to be used when System Preferences > General >
-        /// Appearance is set to Dark.
-        public static func darkImage(altitude: Double, azimuth: Double, index: UInt32) -> Image {
-            return Image(altitude: altitude, azimuth: azimuth, index: index, options: .useForDarkAppearance)
+        /// Creates an image definition.
+        public init(altitude: Double, azimuth: Double, index: UInt32) {
+            self.altitude = altitude
+            self.azimuth = azimuth
+            self.index = index
         }
 
         private enum CodingKeys: String, Swift.CodingKey {
             case altitude = "a"
             case azimuth = "z"
             case index = "i"
-            case options = "o"
         }
 
     }
 
     /// The mapping from the sun's position to an index in the image set.
-    public let solarToIndex: [Image]
+    public var solarToIndex = [Mapping]()
 
-    /// Create the trigger.
-    public init(solarToIndex: [Image]) {
-        self.solarToIndex = solarToIndex
-    }
+    /// The mapping from preference names ("Dark" and "Light") to indexes in the
+    /// image set.
+    public var appearanceIndexes: AppearanceIndexes?
+
+    /// Creates the empty trigger.
+    public init() {}
 
     private enum CodingKeys: String, Swift.CodingKey {
         case solarToIndex = "si"
+        case appearanceIndexes = "ap"
     }
 
 }
 
-extension SolarTrigger.Image: CustomDebugStringConvertible {
+extension SolarTrigger.Mapping: CustomDebugStringConvertible {
 
     public var debugDescription: String {
-        return ".\(options == .useForDarkAppearance ? "dark" : "light")Image(altitude: \(altitude), azimuth: \(azimuth), index: \(index))"
+        return "Mapping(altitude: \(altitude), azimuth: \(azimuth), index: \(index))"
     }
 
 }

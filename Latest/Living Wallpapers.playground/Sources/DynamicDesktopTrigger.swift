@@ -1,8 +1,8 @@
 import AVFoundation
 
-/// A wallpaper trigger describes an index and set of conditions that can be
-/// written with multiple images into a file to serve as a Dynamic Desktop
-/// picture on macOS Mojave.
+/// A dynamic desktop trigger describes a set of conditions that can be written
+/// along with multiple images into a file to serve as a Dynamic Desktop
+/// desktop picture on macOS Mojave.
 ///
 /// This protocol is not meant to be adopted by users. Its conformances in this
 /// framework correspond with the triggers supported by macOS Mojave. You cannot
@@ -21,12 +21,48 @@ import AVFoundation
 /// - seealso:
 /// [Image I/O Framework](https://developer.apple.com/documentation/imageio?language=swift)
 /// [High Efficiency Image File Format](https://en.wikipedia.org/wiki/High_Efficiency_Image_File_Format)
-public protocol WallpaperTrigger: Codable {
+public protocol DynamicDesktopTrigger: Codable {
 
     /// The name of this trigger in Apple's `apple_desktop` namespace.
     ///
     /// It must be a valid XMP name.
     static var tagName: String { get }
+
+}
+
+/// Describes when certain images in the image set should be used based on
+/// the value of:
+///
+/// - System Preferences > General > Appearance
+/// - System Preferences > Desktop & Screen Saver > Dynamic
+public struct DynamicDesktopTriggerAppearanceIndexes: Codable {
+
+    /// The index in the image set for the image that should be used when:
+    ///
+    /// - System Preferences > Desktop & Screen Saver > Dynamic is "Dynamic"
+    ///   and System Preferences > General > Appearance is "Light".
+    /// - System Preferences > Desktop & Screen Saver > Dynamic is
+    ///   "Light (Still)".
+    public var lightIndex: UInt32
+
+    /// The index in the image set for the image that should be used when:
+    ///
+    /// - System Preferences > Desktop & Screen Saver > Dynamic is "Dynamic"
+    ///   and System Preferences > General > Appearance is "Dark".
+    /// - System Preferences > Desktop & Screen Saver > Dynamic is
+    ///   "Dark (Still)".
+    public var darkIndex: UInt32
+
+    /// Creates the still image definition.
+    public init(lightIndex: UInt32, darkIndex: UInt32) {
+        self.lightIndex = lightIndex
+        self.darkIndex = darkIndex
+    }
+
+    private enum CodingKeys: String, Swift.CodingKey {
+        case lightIndex = "l"
+        case darkIndex = "d"
+    }
 
 }
 
@@ -42,7 +78,9 @@ private struct ImageMetadataCodingKey: CodingKey {
     }
 }
 
-extension WallpaperTrigger {
+extension DynamicDesktopTrigger {
+
+    public typealias AppearanceIndexes = DynamicDesktopTriggerAppearanceIndexes
 
     private static var tagPath: String {
         return "apple_desktop:\(tagName)"
@@ -81,6 +119,14 @@ extension WallpaperTrigger {
         let encoded = try PropertyListEncoder().encode(self).base64EncodedString()
         CGImageMetadataRegisterNamespaceForPrefix(imageMetadata, "http://ns.apple.com/namespace/1.0/" as CFString, "apple_desktop" as CFString, nil)
         CGImageMetadataSetValueWithPath(imageMetadata, nil, Self.tagPath as CFString, encoded as CFString)
+    }
+
+}
+
+extension DynamicDesktopTriggerAppearanceIndexes: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        return "AppearanceIndexes(lightIndex: \(lightIndex), darkIndex: \(darkIndex))"
     }
 
 }

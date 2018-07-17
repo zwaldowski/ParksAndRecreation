@@ -4,9 +4,7 @@ import Cocoa
 import AVFoundation
 import PlaygroundSupport
 
-// An appearance trigger has no information, but must still be written to the
-// file to distinguish from single wallpapers.
-let trigger = AppearanceTrigger()
+let trigger = AppearanceTrigger(lightIndex: 0, darkIndex: 1)
 
 let context = NSStringDrawingContext()
 let font = NSFont.boldSystemFont(ofSize: 400)
