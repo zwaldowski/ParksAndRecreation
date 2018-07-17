@@ -1,24 +1,6 @@
 import Cocoa
 import AVFoundation
 
-private extension String {
-
-    init!(base64EncodedUTF8String string: String) {
-        guard let utf8Data = Data(base64Encoded: string) else { return nil }
-        self = String(decoding: utf8Data, as: UTF8.self)
-    }
-
-}
-
-/// A hint to indicate images in a HEIF container should be interprested as
-/// multiple `CGImageSource` items, rather than just one for the entire
-/// container.
-public let kCGImageSourceRespectHEIFFileOrder = String(base64EncodedUTF8String: "a0NHSW1hZ2VTb3VyY2VSZXNwZWN0SEVJRkZpbGVPcmRlcg==") as CFString
-
-/// A hint to indicate the images in the collection should be read without
-/// copying them. As photos these days are rather large, this is preferred.
-public let kCGImageSourceShouldMemoryMap = String(base64EncodedUTF8String: "a0NHSW1hZ2VTb3VyY2VTaG91bGRNZW1vcnlNYXA=") as CFString
-
 extension NSColor {
 
     /// Creates an arbitrary color, without accounting for taste.
