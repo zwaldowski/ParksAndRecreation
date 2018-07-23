@@ -16,8 +16,14 @@ public struct AppearanceTrigger: DynamicDesktopTrigger {
         self.appearanceIndexes = AppearanceIndexes(lightIndex: lightIndex, darkIndex: darkIndex)
     }
 
-    private enum CodingKeys: String, Swift.CodingKey {
-        case appearanceIndexes = "ap"
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.appearanceIndexes = try container.decode(AppearanceIndexes.self)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(appearanceIndexes)
     }
 
 }
