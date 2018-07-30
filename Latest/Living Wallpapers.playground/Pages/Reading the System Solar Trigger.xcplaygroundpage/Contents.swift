@@ -2,7 +2,7 @@
 
 import AVFoundation
 
-let url = URL(fileURLWithPath: "/Library/Desktop Pictures/Mojave (Dynamic).heic")
+let url = URL(fileURLWithPath: "/Library/Desktop Pictures/Mojave.heic")
 
 let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil)!
 
