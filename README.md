@@ -40,6 +40,10 @@ Based on a technique used in the iOS 10 Music app, subclasses of `UICollectionVi
 
 Mathematical operators and idiomatic bridging for Core Graphics types.
 
+### [HTML Reader](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/HaitchTee.playground)
+
+Extremely simple read-only HTML parser based on `libxml2` with 100% test coverage.
+
 ### [Keyboard Layout Guide](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Keyboard%20Layout%20Guide)
 
 An extension on `UIViewController` providing a `keyboardLayoutGuide` property. The layout guide normally mirrors the safe area, but automatically shrinks to avoid the keyboard. It also allows emulating the automatic content keyboard insets applied to `UICollectionViewController` and `UITableViewController`. It avoids the pitfalls of most keyboard avoidance implementations, like correctly syncing animations.
