@@ -95,6 +95,15 @@ using `UIControl`, but for weakly held objects and without unsafe selectors.
 
 Heavily inspired by [this blog post](http://oleb.net/blog/2014/07/swift-instance-methods-curried-functions/) from @ole.
 
+### [`NSView` Layout Margins](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/NSView%20Layout%20Margins.playground)
+
+Extending `NSView` Auto Layout with conveniences from iOS, including
+a view-level version of `NSWindow.contentLayoutGuide` (think of it like you
+would safe areas), `directionalLayoutMargins`, `layoutMarginsGuide`, and
+`readableContentGuide`.
+
+![Layout margins](https://raw.githubusercontent.com/zwaldowski/ParksAndRecreation/master/Media/2018-12-09%20Layout%20Margins.png)
+
 ### [Ordered Dictionary](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Ordered%20Dictionary.playground)
 
 A simple glueing-together of `Dictionary` and `Array` into an ordered, hashed data structure. Useful if your keys are indeed already `Hashable`, but doesn't have great performance; insertion and removal tend towards the worst of both structures. If you have any alternative, prefer something [B-Tree based](https://github.com/lorentey/BTree) instead.
