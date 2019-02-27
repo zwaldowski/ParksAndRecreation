@@ -112,7 +112,7 @@ A simple glueing-together of `Dictionary` and `Array` into an ordered, hashed da
 
 "Size classes are fine, but I can't customize them!" Yeah, you can! By inspecting what Mobile Safari does, you can do the same, using override trait collections.
 
-### [Custom Readable Width](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ReadableWidth.playground)
+### [Custom Readable Width](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Readable%20Width.playground)
 
 Emulating the calculation of [`UIView.readableContentGuide`](https://developer.apple.com/reference/uikit/uiview/1622644-readablecontentguide).
 
