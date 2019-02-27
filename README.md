@@ -120,6 +120,10 @@ Emulating the calculation of [`UIView.readableContentGuide`](https://developer.a
 
 Simple Swift bridging for [`NSRegularExpression`](https://developer.apple.com/library/mac/documentation/Foundation/Reference/NSRegularExpression_Class/), as well as general patterns to go from `String.UTF16View` and `Range<String.UTF16Index>` to `NSString` and `NSRange`.
 
+### [Repeatable UUIDs](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Repeatable%20UUID.playground)
+
+A Swift 5 implementation of the [UUID version 5 algorithm](http://tools.ietf.org/html/4122), which is based on a SHA-1 hash of some input data. These can be useful as database primary keys identifying some model that has no identifier of its own. Like all UUIDs, version 5 hashed UUIDs still have an astronomically low chance of collision.
+
 ### [String Views](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/String%20Views.playground)
 
 Line, paragraph, sentence, and word views for `Swift.String`, providing a more idiomatic take on `StringProtocol.getLineStart(_:end:contentsEnd:for:)` and `StringProtocol.getParagraphStart(_:end:contentsEnd:for:)` as Swift collections.
