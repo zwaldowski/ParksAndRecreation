@@ -38,6 +38,34 @@ class HTMLDocumentTests: XCTestCase {
         XCTAssertNotNil(fragment)
     }
 
+    func testParsesEscapedFragmentWithOneNode() {
+        let fragment = HTMLDocument.parseFragment("&lt;p&gt;Less than character: 4 &lt; 5, 5 &gt; 3&lt;/p&gt;")
+
+        XCTAssertEqual(fragment?.name, "p")
+        XCTAssertEqual(fragment?.kind, .element)
+        XCTAssertEqual(fragment?.content, "Less than character: 4 < 5, 5 > 3")
+    }
+
+    func testParsesEscapedFragmentWithMultipleNodes() {
+        let fragment = HTMLDocument.parseFragment("&lt;p&gt;Less than character: 4 &lt; 5, 5 &gt; 3&lt;/p&gt;&lt;p&gt;And another paragraph.&lt;/p&gt;")
+
+        XCTAssertEqual(fragment?.kind, .documentFragment)
+
+        let paragraph1 = fragment?.first
+        XCTAssertNotNil(paragraph1)
+        XCTAssertEqual(paragraph1?.name, "p")
+        XCTAssertEqual(paragraph1?.kind, .element)
+        XCTAssertEqual(paragraph1?.content, "Less than character: 4 < 5, 5 > 3")
+
+        let paragraph2 = fragment?.dropFirst().first
+        XCTAssertNotNil(paragraph2)
+        XCTAssertEqual(paragraph2?.name, "p")
+        XCTAssertEqual(paragraph2?.kind, .element)
+        XCTAssertEqual(paragraph2?.content, "And another paragraph.")
+
+        XCTAssertNil(fragment?.dropFirst(2).first)
+    }
+
     func testName() {
         XCTAssertEqual(html.name, "html")
     }

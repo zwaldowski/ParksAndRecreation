@@ -3,10 +3,13 @@ import Darwin
 private struct XML2 {
 
     typealias CBufferCreate = @convention(c) () -> UnsafeMutableRawPointer?
-    typealias CBufferGetContent = @convention(c) (UnsafeRawPointer?) -> UnsafePointer<CChar>
     typealias CBufferFree = @convention(c) (UnsafeMutableRawPointer?) -> Void
+    typealias CBufferGetContent = @convention(c) (UnsafeRawPointer?) -> UnsafePointer<CChar>
     typealias CDocFree = @convention(c) (UnsafeMutableRawPointer) -> Void
+    typealias CDocAddFragment = @convention(c) (UnsafeMutableRawPointer) -> UnsafeMutableRawPointer?
     typealias CDocGetRootElement = @convention(c) (UnsafeRawPointer) -> UnsafeMutableRawPointer?
+    typealias CNodeAddChild = @convention(c) (_ parent: UnsafeMutableRawPointer, _ cur: UnsafeRawPointer) -> UnsafeMutableRawPointer?
+    typealias CNodeUnlink = @convention(c) (UnsafeRawPointer) -> Void
     typealias CNodeCopyProperty = @convention(c) (UnsafeRawPointer, UnsafePointer<CChar>) -> UnsafeMutablePointer<CChar>?
     typealias CNodeCopyContent = @convention(c) (UnsafeRawPointer) -> UnsafeMutablePointer<CChar>?
     typealias CHTMLNodeDump = @convention(c) (UnsafeMutableRawPointer?, UnsafeRawPointer, UnsafeRawPointer) -> Int32
@@ -14,10 +17,13 @@ private struct XML2 {
 
     // libxml/tree.h
     let bufferCreate: CBufferCreate
-    let bufferGetContent: CBufferGetContent
     let bufferFree: CBufferFree
+    let bufferGetContent: CBufferGetContent
     let docFree: CDocFree
+    let docAddFragment: CDocAddFragment
     let docGetRootElement: CDocGetRootElement
+    let nodeAddChild: CNodeAddChild
+    let nodeUnlink: CNodeUnlink
     let nodeCopyProperty: CNodeCopyProperty
     let nodeCopyContent: CNodeCopyContent
 
@@ -31,10 +37,13 @@ private struct XML2 {
         let handle = dlopen("/usr/lib/libxml2.dylib", RTLD_LAZY)
         return XML2(
             bufferCreate: unsafeBitCast(dlsym(handle, "xmlBufferCreate"), to: CBufferCreate.self),
-            bufferGetContent: unsafeBitCast(dlsym(handle, "xmlBufferContent"), to: CBufferGetContent.self),
             bufferFree: unsafeBitCast(dlsym(handle, "xmlBufferFree"), to: CBufferFree.self),
+            bufferGetContent: unsafeBitCast(dlsym(handle, "xmlBufferContent"), to: CBufferGetContent.self),
             docFree: unsafeBitCast(dlsym(handle, "xmlFreeDoc"), to: CDocFree.self),
+            docAddFragment: unsafeBitCast(dlsym(handle, "xmlNewDocFragment"), to: CDocAddFragment.self),
             docGetRootElement: unsafeBitCast(dlsym(handle, "xmlDocGetRootElement"), to: CDocGetRootElement.self),
+            nodeAddChild: unsafeBitCast(dlsym(handle, "xmlAddChild"), to: CNodeAddChild.self),
+            nodeUnlink: unsafeBitCast(dlsym(handle, "xmlUnlinkNode"), to: CNodeUnlink.self),
             nodeCopyProperty: unsafeBitCast(dlsym(handle, "xmlGetProp"), to: CNodeCopyProperty.self),
             nodeCopyContent: unsafeBitCast(dlsym(handle, "xmlNodeGetContent"), to: CNodeCopyContent.self),
             htmlNodeDump: unsafeBitCast(dlsym(handle, "htmlNodeDump"), to: CHTMLNodeDump.self),
@@ -103,9 +112,28 @@ public final class HTMLDocument {
 
 extension HTMLDocument {
 
-    /// Parses the HTML contents of a string source.
+    /// Parses the HTML contents of a string source, such as "<p>Hello.</p>"
     public static func parse<Input>(_ input: Input) -> Node? where Input: StringProtocol {
         return HTMLDocument(parsing: input)?.root
+    }
+
+    /// Parses the HTML contents of an escaped string source, such as "&lt;p&gt;Hello.&lt;/p&gt;".
+    public static func parseFragment<Input>(_ input: Input) -> Node? where Input: StringProtocol {
+        guard let document = HTMLDocument(parsing: "<html><body>\(input)"),
+            let textNode = document.root?.first?.first, textNode.kind == .text,
+            let rootNode = parse("<root>\(textNode.content)") else { return nil }
+
+        if let onlyChild = rootNode.first, rootNode.dropFirst().isEmpty {
+            return onlyChild
+        } else if let fragment = XML2.shared.docAddFragment(rootNode.document.handle) {
+            for child in rootNode {
+                XML2.shared.nodeUnlink(child.handle)
+                XML2.shared.nodeAddChild(fragment, child.handle)
+            }
+            return Node(document: rootNode.document, handle: fragment)
+        } else {
+            return nil
+        }
     }
 
     /// The root node of the receiver.
