@@ -116,6 +116,12 @@ A simple glueing-together of `Dictionary` and `Array` into an ordered, hashed da
 
 Emulating the calculation of [`UIView.readableContentGuide`](https://developer.apple.com/reference/uikit/uiview/1622644-readablecontentguide).
 
+### [Receding Navigation Title](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Receding%20Navigation%20Title.playground)
+
+Approximating multi-line large titles in navigation bars seen in News, Music, etc.
+
+![Badge gallery](https://raw.githubusercontent.com/zwaldowski/ParksAndRecreation/master/Media/2019-05-20%20Receding%20Navigation%20Title.gif)
+
 ### [Regular Expressions](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/RegularExpression.playground)
 
 Simple Swift bridging for [`NSRegularExpression`](https://developer.apple.com/library/mac/documentation/Foundation/Reference/NSRegularExpression_Class/), as well as general patterns to go from `String.UTF16View` and `Range<String.UTF16Index>` to `NSString` and `NSRange`.

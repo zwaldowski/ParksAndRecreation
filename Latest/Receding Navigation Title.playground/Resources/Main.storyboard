@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="rBW-hI-T20">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--This is a really long title that is probably going to get chopped off-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="MyViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DEt-i1-BIO">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" layoutMarginsFollowReadableWidth="YES" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="02k-sv-B2f">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="4728"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This is a really long title that is probably going to get chopped off" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" minimumScaleFactor="0.59999999999999998" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kSK-nd-Or1">
+                                                <rect key="frame" x="20" y="22" width="374" height="49"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="Apple News, including Apple News+, is designed to protect your information and enable you to choose what you share." textAlignment="natural" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EC4-RG-oY5">
+                                                <rect key="frame" x="20" y="91" width="374" height="91"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                            </textView>
+                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" textAlignment="natural" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ExV-nF-Ngb">
+                                                <rect key="frame" x="20" y="202" width="374" height="4504"/>
+                                                <string key="text">Protecting the privacy and security of your information is a priority for everyone at Apple. We work hard to collect only the data we need to make your experience better. When we do collect data we believe it’s important for you to know what we’re collecting and why we need it, so you can make informed choices. Apple News, like every Apple product, is designed around these principles.
+
+Apple collects information about how you use Apple News in order to tailor features to your personal interests. For example, the Today feature provides you with a personal news feed that highlights the best stories for you from your favorite channels and topics. Apple is able to make these features possible by collecting information about which stories you read, save, or share, and the topics and channels you follow. When you enable notifications for a channel you are following in Apple News, we store that information to notify you about important stories and new issues from the channel. If you enable “New Features &amp; Tips” notifications, we may also use this information to notify you with tips and new features in Apple News that you may like.
+
+(New issue notifications are available only for Apple News+ subscribers. “New Features &amp; Tips” notifications are available only when you are signed in to an iTunes Store account. Both of these notifications are available on iOS only.)  
+
+We understand that the articles you read are personal, so we designed Apple News and the linked Stocks app so your reading activity is not linked to other Apple services. The data we collect is associated with an identifier specific to the Apple News and Stocks apps. 
+
+Recommendations in Today are made based on the information stored on your device. To remove your reading history from your device, tap or click “Clear” in the History section of Apple News. This will also reset the identifier used for Apple News and Stocks. You can also reset the identifier by selecting the “Reset Identifier” option in Settings on iOS or in the menu bar on Mac.
+
+Siri suggests stories, channels, and topics you may like based on on-device information derived from the apps you use and the websites you visit with Safari. Also, when you use search in Apple News, information including recently used apps and popular apps installed on your device is sent to Apple with your search query to provide you with relevant search results. If you allow Apple News to access your location, your location is also used to provide more relevant search results. This information is not associated with your Apple ID.
+
+If you subscribe to Apple News+, you will receive access to subscription content from a variety of publications. Alternatively, you can access subscription content from individual publications in one of several ways.
+
+First, Apple News will check your iTunes Store account to see if you have any active subscriptions from the App Store that can be used in Apple News. If so, Apple News will automatically unlock your subscription and give you full access to the publication’s paid articles. Second, you can purchase a subscription to an individual publication directly in the Apple News app, in which case you can choose to share your personal information with the publication. Third, if you’ve previously purchased a subscription directly from a publication (e.g. on the publication’s website), the publisher may allow you to log in with your subscription account in Apple News. The publication will then verify your subscription and grant you access to their subscription content in Apple News. 
+
+If you have an individual subscription to a publication that is part of Apple News+, you will be able to access paid content from that publication even if you don’t have an Apple News+ subscription.
+
+As a convenience for you, Apple News uses iCloud to keep aspects of your experience up to date on all of your devices. For example, Apple News will use iCloud to remember which channels and topics you follow, your reading history, and your reading preferences so that you can enjoy the same Apple News experience from any of your devices. Your reading history is stored for up to three months. If you unfollow a channel or topic, remove an article from your Saved Stores, or delete an article from your reading history, that information will be deleted from Apple’s servers immediately. You may disable this capability at any time in Settings on an iOS device or System Preferences on a Mac. If you have disabled this feature, please note that the channels and topics you follow, your reading history, and your reading preferences are still backed up to iCloud if iCloud Backup is enabled.
+
+So we can provide you with updates about important stories, you may also provide us with your email address. You can change your email preferences and opt in or out of receiving emails about Apple News stories on appleid.apple.com.
+
+In order to deliver great content to you from leading publishers, Apple News is ad supported. We respect your privacy and if you’d rather not see ads in Apple News tailored to your interests, you can opt out of targeted advertising by following the guidance provided at support.apple.com/kb/HT202074. You can also reset your advertising identifier at any time. The articles you read in Apple News will only be used to send advertisements to you when you are in the Apple News or Stocks apps. Apple collects information about the ads you see and interact with in order to report to advertisers and provide them with information about the effectiveness of their advertising campaigns.
+
+Apple may also use information about your use of Apple News to pay publishers and prevent or take action against activities that are, or may be, in breach of the iOS or macOS Software License Agreement or applicable law.
+
+We may collect, use, transfer, and disclose non-personal information for any purpose. For example, we may aggregate your non-personal information with that of other Apple News users in order to improve the service.
+
+Information collected by Apple will be treated in accordance with Apple’s Privacy Policy, which can be found at www.apple.com/privacy
+
+Disclosure to Third Parties
+
+We do not share any of your individual data with third parties. We are obligated to make certain non-personal information and non-identifiable aggregate information available to strategic partners that work with Apple to provide our products and services, or that help Apple market to customers. However, only aggregated data is provided to these strategic and marketing partners. For example, Apple may share aggregate reports with Apple News publishers to help them understand the way users read or use their content. Apple may also share information with strategic partners who provide services such as information processing, providing customer service, assessing your interest in our products and services, and conducting customer research or satisfaction surveys on our behalf. These companies are obligated to protect your information and may be located wherever Apple operates.
+
+Apple News also allows you to share Apple News content with other websites or social networks. When you share Apple News content to other places like websites or social networks, that information is governed by those websites’ or social networks’ privacy policies. If you do not want this information to be shared with third parties, do not share Apple News content to third-party websites or social networks.
+
+Information about products not manufactured by Apple, or independent websites not controlled or tested by Apple, is provided without recommendation or endorsement. Apple assumes no responsibility with regard to the selection, performance, or use of third-party websites or products. Apple makes no representations regarding third-party website accuracy or reliability. Risks are inherent in the use of the Internet. Contact the vendor for additional information. Other company and product names may be trademarks of their respective owners.</string>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                            </textView>
+                                        </subviews>
+                                        <edgeInsets key="layoutMargins" top="22" left="20" bottom="22" right="20"/>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="02k-sv-B2f" firstAttribute="leading" secondItem="DEt-i1-BIO" secondAttribute="leading" id="FwV-Sa-J3g"/>
+                                    <constraint firstAttribute="trailing" secondItem="02k-sv-B2f" secondAttribute="trailing" id="OHL-Ky-MhM"/>
+                                    <constraint firstItem="02k-sv-B2f" firstAttribute="top" secondItem="DEt-i1-BIO" secondAttribute="top" id="cl6-8i-0TT"/>
+                                    <constraint firstAttribute="bottom" secondItem="02k-sv-B2f" secondAttribute="bottom" id="mgB-kr-N4l"/>
+                                    <constraint firstItem="02k-sv-B2f" firstAttribute="width" secondItem="DEt-i1-BIO" secondAttribute="width" id="nx3-dI-UTT"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="DEt-i1-BIO" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="OI1-Uk-xhh"/>
+                            <constraint firstAttribute="bottom" secondItem="DEt-i1-BIO" secondAttribute="bottom" id="PhP-Ya-8PZ"/>
+                            <constraint firstAttribute="trailing" secondItem="DEt-i1-BIO" secondAttribute="trailing" id="gwq-pW-Bgw"/>
+                            <constraint firstItem="DEt-i1-BIO" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="yGr-QY-nPc"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="lyk-Pg-eo8"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="This is a really long title that is probably going to get chopped off" largeTitleDisplayMode="never" id="Igq-Im-d6V">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="RcT-wd-LZc"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="scrollView" destination="DEt-i1-BIO" id="a3j-2d-DO5"/>
+                        <outlet property="titleLabel" destination="kSK-nd-Or1" id="sun-XM-mbF"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="328" y="94"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="n6K-Fy-5gc">
+            <objects>
+                <navigationController id="rBW-hI-T20" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="Wet-bD-zoe">
+                        <rect key="frame" x="0.0" y="44" width="414" height="96"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="hRp-hZ-0EM"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xzW-Vq-2xl" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-446" y="94"/>
+        </scene>
+    </scenes>
+</document>
