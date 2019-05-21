@@ -1,11 +1,3 @@
-//
-//  HighlightingFilter.swift
-//  WeAllFloat
-//
-//  Created by Zachary Waldowski on 4/5/17.
-//  Copyright © 2017 Big Nerd Ranch. All rights reserved.
-//
-
 import UIKit
 
 /// A lazily-created effect that uses view composition to toggle dynamically.

@@ -1,11 +1,3 @@
-//
-//  AccessoryTabBarController.swift
-//  WeAllFloat
-//
-//  Created by Zachary Waldowski on 2/23/17.
-//  Copyright © 2017 Big Nerd Ranch. All rights reserved.
-//
-
 import UIKit
 
 /// A drop-in tab bar controller that can have a palette above the tab bar, like
@@ -131,9 +123,7 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
     }
 
     override open func updateViewConstraints() {
-        if let paletteView = paletteViewController?.viewIfLoaded, !paletteView.translatesAutoresizingMaskIntoConstraints {
-            palettePreferredHeight.constant = paletteView.systemLayoutSizeFitting(CGSize(width: view.bounds.width, height: 0), withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
-        } else if paletteViewController == nil {
+        if paletteViewController == nil {
             palettePreferredHeight.constant = 0
         }
 
@@ -181,12 +171,14 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
     /// view controller.
     public func setPaletteViewController(_ newValue: UIViewController?, animated: Bool) {
         let oldValue = paletteViewController?.viewIfLoaded?.superview == nil ? nil : paletteViewController
-        guard isViewLoaded else {
+        guard viewIfLoaded?.window != nil else {
             // No use setting up views until viewDidLoad...
             if let oldValue = oldValue, oldValue !== newValue {
                 startUninstalling(oldValue, animated: false)
-                oldValue.removeFromParent()
+                finishUninstalling(oldValue)
             }
+
+            paletteViewController = newValue
 
             if let newValue = newValue, oldValue !== newValue {
                 startInstalling(newValue, animated: false)
@@ -282,11 +274,11 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
     }
 
     private func finishUninstalling(_ oldValue: UIViewController) {
-        assert(isViewLoaded)
+        let isLive = viewIfLoaded?.window != nil
 
-        let isLive = view.window != nil
+        oldValue.viewIfLoaded?.removeFromSuperview()
 
-        oldValue.view.removeFromSuperview()
+        oldValue.removeFromParent()
 
         if isLive {
             oldValue.endAppearanceTransition()
@@ -316,10 +308,7 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
                 paletteContainer.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor)
             ])
 
-            // This serves a dual purpose: give the palette container a more
-            // accurate ambuiguty-breaker, and activating the monitor for
-            // systemLayoutFittingSizeDidChange(forChildContentContainer:).
-            palettePreferredHeight.constant = viewController.view.systemLayoutSizeFitting(CGSize(width: view.bounds.width, height: 0), withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
+            palettePreferredHeight.constant = 0
         }
 
         updateHighlightingSupport()
@@ -332,10 +321,13 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
     // MARK: - Highlight support
 
     private func updateHighlightingSupport() {
+        guard isViewLoaded else { return }
         paletteHighlight.isActive = false
         paletteHighlightGesture.isEnabled = paletteViewController?.view.gestureRecognizers?.contains(where: { (gestureRecognizer) in
-            (gestureRecognizer is UITapGestureRecognizer) || (gestureRecognizer is UILongPressGestureRecognizer)
-        }) ?? false
+            gestureRecognizer is UITapGestureRecognizer || gestureRecognizer is UILongPressGestureRecognizer
+        }) == true || paletteViewController?.view.subviews.contains(where: { (subview) in
+            subview is UIButton
+        }) == true
     }
 
     @objc

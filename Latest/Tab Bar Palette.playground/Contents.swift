@@ -81,8 +81,8 @@ final class FirstViewController: UIViewController {
         screenBottomContainer.addSubview(screenBottom)
 
         NSLayoutConstraint.activate([
-            toggleStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            toggleStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            toggleStack.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            toggleStack.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
 
             layoutTopContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             layoutTopContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -101,7 +101,7 @@ final class FirstViewController: UIViewController {
             layoutBottom.centerYAnchor.constraint(equalTo: layoutBottomContainer.layoutMarginsGuide.centerYAnchor),
 
             screenBottomContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            screenBottomContainer.topAnchor.constraint(greaterThanOrEqualTo: toggleStack.bottomAnchor),
+            screenBottomContainer.topAnchor.constraint(greaterThanOrEqualToSystemSpacingBelow: toggleStack.bottomAnchor, multiplier: 1),
             view.bottomAnchor.constraint(equalTo: screenBottomContainer.bottomAnchor),
 
             screenBottom.topAnchor.constraint(equalTo: screenBottomContainer.layoutMarginsGuide.topAnchor),
@@ -109,7 +109,6 @@ final class FirstViewController: UIViewController {
             screenBottom.centerXAnchor.constraint(equalTo: screenBottomContainer.layoutMarginsGuide.centerXAnchor),
             layoutBottomContainer.topAnchor.constraint(greaterThanOrEqualTo: screenBottom.bottomAnchor, constant: 12)
         ])
-
     }
 
     @objc private func togglePalette(_ sender: UISwitch) {

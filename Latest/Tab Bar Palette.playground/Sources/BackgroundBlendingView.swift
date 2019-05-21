@@ -1,11 +1,3 @@
-//
-//  BackgroundBlendingView.swift
-//  WeAllFloat
-//
-//  Created by Zachary Waldowski on 3/1/17.
-//  Copyright © 2017 Big Nerd Ranch. All rights reserved.
-//
-
 import UIKit
 
 final class BackgroundBlendingView: UIView {
