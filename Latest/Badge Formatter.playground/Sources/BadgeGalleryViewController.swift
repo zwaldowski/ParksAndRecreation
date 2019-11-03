@@ -12,9 +12,11 @@ public final class BadgeGalleryViewController: UICollectionViewController, UICol
             static let cornerRadius: CGFloat = 8.5
         }
 
-        @IBOutlet private var label: UILabel!
+        private let label = UILabel()
 
-        private func commonInit() {
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            
             let bv = UIView()
             bv.backgroundColor = #colorLiteral(red: 0.9490196078, green: 0.9568627451, blue: 1, alpha: 0.14)
             bv.layer.cornerRadius = Constants.cornerRadius
@@ -24,22 +26,13 @@ public final class BadgeGalleryViewController: UICollectionViewController, UICol
             sbv.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
             sbv.layer.cornerRadius = Constants.cornerRadius
             self.selectedBackgroundView = sbv
-        }
-
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-
-            commonInit()
-
-            let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
             label.textAlignment = .center
             label.font = .systemFont(ofSize: 32, weight: .bold)
             label.textColor = .white
             label.highlightedTextColor = tintColor
             contentView.addSubview(label)
-            self.label = label
-
+            
             NSLayoutConstraint.activate([
                 label.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
                 contentView.layoutMarginsGuide.trailingAnchor.constraint(equalTo: label.trailingAnchor),
@@ -48,9 +41,8 @@ public final class BadgeGalleryViewController: UICollectionViewController, UICol
             ])
         }
 
-        required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-            commonInit()
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
         }
 
         override func tintColorDidChange() {
@@ -122,7 +114,6 @@ public final class BadgeGalleryViewController: UICollectionViewController, UICol
     override public func viewDidLoad() {
         super.viewDidLoad()
 
-        guard let collectionView = collectionView else { return }
         collectionView.allowsMultipleSelection = true
         collectionView.register(Cell.self, forCellWithReuseIdentifier: Constants.cellIdentifier)
         collectionView.dragDelegate = self
