@@ -101,8 +101,8 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
         paletteHairlineHeight.constant = effectiveHairline
     }
 
-    override open func overrideTraitCollection(forChildViewController childViewController: UIViewController) -> UITraitCollection? {
-        let overrideTraitCollection = super.overrideTraitCollection(forChildViewController: childViewController)
+    override open func overrideTraitCollection(forChild childViewController: UIViewController) -> UITraitCollection? {
+        let overrideTraitCollection = super.overrideTraitCollection(forChild: childViewController)
         guard childViewController === paletteViewController else { return overrideTraitCollection }
 
         var toCombine = [UITraitCollection]()
@@ -124,7 +124,7 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
         // itself migrates to using `additionalSafeAreaInsets`.
         let newPaletteHeight = paletteViewController != nil ? paletteContainer.frame.size.height : 0
         let paletteHeightDelta = newPaletteHeight - lastPaletteHeight
-        for viewController in childViewControllers {
+        for viewController in children {
             viewController.additionalSafeAreaInsets.bottom += paletteHeightDelta
         }
         self.lastPaletteHeight = newPaletteHeight
@@ -156,7 +156,7 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
         super.willTransition(to: newCollection, with: coordinator)
 
         guard let paletteViewController = paletteViewController else { return }
-        let traitCollection = overrideTraitCollection(forChildViewController: paletteViewController).map {
+        let traitCollection = overrideTraitCollection(forChild: paletteViewController).map {
             UITraitCollection(traitsFrom: [ newCollection, $0 ])
         } ?? newCollection
         paletteViewController.willTransition(to: traitCollection, with: coordinator)
@@ -185,7 +185,7 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
             // No use setting up views until viewDidLoad...
             if let oldValue = oldValue, oldValue !== newValue {
                 startUninstalling(oldValue, animated: false)
-                oldValue.removeFromParentViewController()
+                oldValue.removeFromParent()
             }
 
             if let newValue = newValue, oldValue !== newValue {
@@ -257,11 +257,11 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
     }
 
     private func startInstalling(_ newValue: UIViewController, animated: Bool) {
-        newValue.willMove(toParentViewController: self)
-        newValue.removeFromParentViewController()
+        newValue.willMove(toParent: self)
+        newValue.removeFromParent()
         newValue.edgesForExtendedLayout.remove(.bottom)
         newValue.setValue(self, forKeyPath: "parentViewController")
-        defer { newValue.didMove(toParentViewController: self) }
+        defer { newValue.didMove(toParent: self) }
 
         guard isViewLoaded else { return }
 
@@ -274,7 +274,7 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
     }
 
     private func startUninstalling(_ oldValue: UIViewController, animated: Bool) {
-        oldValue.willMove(toParentViewController: nil)
+        oldValue.willMove(toParent: nil)
 
         if viewIfLoaded?.window != nil {
             oldValue.beginAppearanceTransition(false, animated: animated)
@@ -292,7 +292,7 @@ open class AccessoryTabBarController: UITabBarController, UIGestureRecognizerDel
             oldValue.endAppearanceTransition()
         }
 
-        oldValue.removeFromParentViewController()
+        oldValue.removeFromParent()
 
         view.setNeedsUpdateConstraints()
 

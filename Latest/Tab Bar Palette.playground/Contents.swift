@@ -15,15 +15,15 @@ final class FirstViewController: UIViewController {
         fatalError()
     }
 
-    override func didMove(toParentViewController parent: UIViewController?) {
-        super.didMove(toParentViewController: parent)
+    override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
 
         navigationController?.tabBarItem.title = title
     }
 
     override func loadView() {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         self.view = view
 
         let toggleStack = UIStackView()
@@ -131,8 +131,8 @@ final class SecondViewController: UIViewController {
         fatalError()
     }
 
-    override func didMove(toParentViewController parent: UIViewController?) {
-        super.didMove(toParentViewController: parent)
+    override func didMove(toParent parent: UIViewController?) {
+        super.didMove(toParent: parent)
 
         navigationController?.tabBarItem.title = title
     }
@@ -274,14 +274,14 @@ final class PaletteViewController: UIViewController {
         print("Palette view did disappear")
     }
 
-    override func willMove(toParentViewController parent: UIViewController?) {
-        super.willMove(toParentViewController: parent)
+    override func willMove(toParent parent: UIViewController?) {
+        super.willMove(toParent: parent)
 
         print("Palette will move to \(String(describing: parent))")
     }
 
-    override func didMove(toParentViewController parent: UIViewController?) {
-        super.willMove(toParentViewController: parent)
+    override func didMove(toParent parent: UIViewController?) {
+        super.willMove(toParent: parent)
 
         print("Palette did move to \(String(describing: parent))")
     }

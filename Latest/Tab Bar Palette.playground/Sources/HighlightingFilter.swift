@@ -42,7 +42,7 @@ extension HighlightingFilter {
             }
 
             if let highlightView = highlightView {
-                containerView.bringSubview(toFront: highlightView)
+                containerView.bringSubviewToFront(highlightView)
                 highlightView.alpha = newValue ? 1 : 0
             }
         }
