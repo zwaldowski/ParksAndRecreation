@@ -13,11 +13,11 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
     private let helper = ScrollViewDerivedBoundsHelper()
 
     private func commonInit() {
-        helper.owner = self
         helper.isEnabled = !isScrollEnabled
+        helper.owner = self
     }
 
-    public override init(frame: CGRect, style: UITableViewStyle) {
+    public override init(frame: CGRect, style: UITableView.Style) {
         super.init(frame: frame, style: style)
         commonInit()
     }
@@ -55,7 +55,9 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
             return super.frame
         }
         set {
-            super.frame = newValue
+            helper.whileClippingBounds {
+                super.frame = newValue
+            }
         }
     }
 
@@ -64,7 +66,9 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
             return helper.shouldClipBounds ? helper.visibleBounds(forOriginalBounds: super.bounds) : super.bounds
         }
         set {
-            super.bounds = newValue
+            helper.whileClippingBounds {
+                super.bounds = newValue
+            }
         }
     }
 
@@ -100,8 +104,9 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
         guard helper.shouldSizeToFit else {
             return super.intrinsicContentSize
         }
-        
-        return CGSize(width: UIViewNoIntrinsicMetric, height: contentSize.height)
+
+        layoutIfNeeded()
+        return CGSize(width: UIView.noIntrinsicMetric, height: contentSize.height)
     }
 
     // MARK: - ScrollViewBoundsDeriving
@@ -111,7 +116,7 @@ public final class DerivingContentSizeTableView: UITableView, ScrollViewBoundsDe
         //  - collection view layout invalidation
         //  - set the "scheduledUpdateVisibleCells" flag
         let oldBounds = super.bounds
-        super.bounds = oldBounds.insetBy(dx: 0, dy: .ulpOfOne)
+        super.bounds = helper.visibleBounds(forOriginalBounds: oldBounds)
         super.bounds = oldBounds
     }
 
