@@ -131,12 +131,11 @@ public final class AnyAsynchronousOperation: AsynchronousOperation {
 
     }
 
-    /// The queue to invoke `handler` on.
+    /// The queue to invoke `handlers` on.
     private let queue: DispatchQueue
 
-    /// Should be obvious. Optional because we clear it out (to alleviate
-    /// potential reference cycles) in `finish()`.
-    private var handlers: [Handler]?
+    /// Should be obvious.
+    private var handlers: [Handler]
 
     /// Creates the asynchronous operation for executing using the
     /// `configuration`.
@@ -147,24 +146,20 @@ public final class AnyAsynchronousOperation: AsynchronousOperation {
 
     /// Executes the `handler`, calling `finish` when is it done.
     override public final func execute(finish: @escaping () -> Void) {
-        switch handlers {
-        case let handlers? where handlers.count >= 1:
-            let group = DispatchGroup()
-            for handler in handlers {
-                group.enter()
-                queue.async {
-                    handler(group.leave)
-                }
-            }
-            group.notify(queue: queue, execute: finish)
-        case let handlers? where handlers.count == 1:
-            let handler = handlers[0]
+        let group = DispatchGroup()
+        for handler in handlers {
+            group.enter()
             queue.async {
-                handler(finish)
+                handler(group.leave)
             }
-        default:
-            queue.async(execute: finish)
         }
+        group.notify(queue: queue, execute: finish)
+    }
+    
+    override func finish() {
+        super.finish()
+        
+        handlers.removeAll()
     }
 
 }

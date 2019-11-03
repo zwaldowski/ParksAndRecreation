@@ -7,7 +7,7 @@ enum FakeCompletionHandlerAPI {
 
     static func doVeryImportantThing(completion handler: @escaping() -> Void) {
         dispatchPrecondition(condition: .onQueue(.main))
-        let time = DispatchTime.now() + (0 ..< 5).random()
+        let time = DispatchTime.now() + .random(in: 0 ..< 5)
         DispatchQueue.main.asyncAfter(deadline: time, execute: handler)
     }
 
