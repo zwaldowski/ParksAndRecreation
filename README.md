@@ -20,6 +20,10 @@ A simple class for using Unicode to encircle some characters or single-digit num
 
 Derived from @krzyzanowskim's [blog post](http://blog.krzyzanowskim.com/2015/10/24/chunksequence-have-cake-and-eat-it/): use a protocol extension to split any collection into a group of slices. Think `flatten()`, but in reverse.
 
+### [Combinatorial Parsers](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Combinatorial%20Parsers.playground)
+
+A thought exercise strongly inspired by @khanlou (blog post [here](http://khanlou.com/2019/12/regex-vs-combinatorial-parsing/)) and @pointfreeco for a more protocol-oriented, composable parsing flavored like Swift Combine.
+
 ### [Custom Truncation](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/CustomTruncation.playground)
 
 Use [TextKit](https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/CustomTextProcessing/CustomTextProcessing.html) to perform custom truncation with high performance. Also an example of creating building a drop-in `UILabel` backed by TextKit.
