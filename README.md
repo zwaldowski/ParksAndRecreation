@@ -1,8 +1,8 @@
 # ParksAndRecreation
 
-Various Swift playgrounds, for fun and for profit.
+Various Swift and SwiftUI tidbits, for fun and for profit.
 
-## Index
+## Swift
 
 ### [Asynchronous Operations](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Latest/Asynchronous%Operations.playground)
 
@@ -167,6 +167,16 @@ rounding and equation operators that account for floating point inaccuracy.
 ### [View Recursion](https://github.com/zwaldowski/ParksAndRecreation/blob/master/Swift-2/ViewRecursion.playground)
 
 Showing off the simple power of Swift iterators by performing breadth-first travel through the trees created by `UIView`, `UIViewController`, and `CALayer`.
+
+## SwiftUI
+
+### [Stickiness](https://github.com/zwaldowski/ParksAndRecreation/blob/master/SwiftUI/Stickiness)
+
+Hiding and unhiding the top and bottoms bars of on scroll to match the various onboarding UIs in iOS (Settings, Apple Pay, Health, etc.)
+
+Similar to [Receding Navigation Title](https://github.com/zwaldowski/ParksAndRecreation#receding-navigation-title) in UIKit.
+
+## Archive
 
 ### Obsoleted in Swift 4
 
